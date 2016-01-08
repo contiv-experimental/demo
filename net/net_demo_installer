@@ -191,7 +191,6 @@ ansible $NETPLUGIN_HOSTGROUP -m setup $ans_opts -i $HOST_INVENTORY_FILE | grep -
 # Use netmaster's default ip as service vip
 svc_vip=$(ansible node1 -m setup $ans_opts -i $HOST_INVENTORY_FILE | grep -A 4 ansible_eth1 | grep address | awk -F \" '{print $4}')
 no_proxy=$(sed ':a;N;$!ba;s/\n/,/g' $HOST_IP_LOG_FILE)",127.0.0.1,localhost,netmaster"
-echo $no_proxy
 echo '{"env":{"http_proxy":"'$http_proxy'", "HTTP_PROXY":"'$http_proxy'", "https_proxy":"'$https_proxy'", "no_proxy":"'$no_proxy'"}, "monitor_interface": "eth1", "etcd_peers_group": '"\"$NETPLUGIN_HOSTGROUP\""', "service_vip": '"\"$svc_vip\""'}' > $ENV_FILE
     ansible-playbook $ans_opts -i $HOST_INVENTORY_FILE  -e "`cat $ENV_FILE`" $ANSIBLE_SITE_FILE
 
