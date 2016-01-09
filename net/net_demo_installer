@@ -194,10 +194,6 @@ no_proxy=$(sed ':a;N;$!ba;s/\n/,/g' $HOST_IP_LOG_FILE)",127.0.0.1,localhost,netm
 echo '{"env":{"http_proxy":"'$http_proxy'", "HTTP_PROXY":"'$http_proxy'", "https_proxy":"'$https_proxy'", "no_proxy":"'$no_proxy'"}, "monitor_interface": "eth1", "etcd_peers_group": '"\"$NETPLUGIN_HOSTGROUP\""', "service_vip": '"\"$svc_vip\""'}' > $ENV_FILE
     ansible-playbook $ans_opts -i $HOST_INVENTORY_FILE  -e "`cat $ENV_FILE`" $ANSIBLE_SITE_FILE
 
-# Finally run restart to clean up any left over state.
-echo "Waiting 45 sec for services to initialize..."
-sleep 45
-
 DOCKER_HOST=$(service swarm status | grep "tcp://" | awk '{ print $5 }')
 if [ -z "$DOCKER_HOST" ]; then
   echo "swarm status does not look correct. Please retry install."
