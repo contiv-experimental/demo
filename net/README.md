@@ -12,10 +12,10 @@
 
 4. It is recommended that you enable passwordless SSH access from the selected server to all
    the other servers in the cluster.
-   An example of how to set this up is here: http://www.linuxproblem.org/art_9.html
+   An example of how to set this up is [here](http://www.linuxproblem.org/art_9.html)
 
 5. It is recommended that you enable passwordless sudo on all servers as well.
-   An example set up is here: http://askubuntu.com/questions/192050/how-to-run-sudo-command-with-no-password
+   Example set up instructions can be found [here](http://askubuntu.com/questions/192050/how-to-run-sudo-command-with-no-password)
 
 6. Get the ip addresses (dns names work as well) of all the servers
 
@@ -36,12 +36,12 @@ for it to work.
 The installer script performs the following actions:
 - performs preliminary checks to verify that the right version of OS is installed on the servers
 - verifies that access to the servers can be established
-- creates the inventory file 
+- creates the ansible inventory file 
 - establishes variables necessary for the servers to be provisioned in the appropriate mode
 - runs the ansible playbook which installs necessary packages and brings up the services
 
 ### Troubleshooting
-This is the first cut of installer script. Improvements to the script will be added in shortly. 
+This is the first cut of installer script.
 The current limitations of the script are as follows:
 - Connections to the servers are assumed to be on the default ssh port and the default username used is the local hostname
 - IPs are assumed to be on the eth1 interface (as they were ). If you have the IPs set on any other interface [eth{x}], 
