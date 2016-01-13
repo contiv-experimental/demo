@@ -20,7 +20,6 @@ function ParseArguments {
     for ((i=1; i<=$#; i++)); do
         node_name=node$i
         node_ip[$node_name]=$(echo ${!i} | cut -f1 -d:)
-        node_if[$node_name]=eth0
         if echo ${!i} | grep ":" > /dev/null; then
             node_if[$node_name]=$(echo ${!i} | cut -f2 -d:)
         fi
@@ -145,11 +144,6 @@ echo "\
 [defaults]
 host_key_checking = False" > ~/.ansible.cfg
 
-echo "Contents of $HOST_INVENTORY_FILE:"
-echo "-----------------"
-cat $HOST_INVENTORY_FILE
-echo "-----------------"
-
 # Verify ansible can reach all hosts
 echo "Verifying ansible reachability"
 ansible all -i $HOST_INVENTORY_FILE -a "/bin/cat /etc/issue.net" >& $HOST_LOG_FILE
@@ -205,10 +199,24 @@ set -e
 
 echo "-----------------"
 
+# Assign proper interface if nothing is specified by default
+for ((i=1; i<=$#; i++)); do
+    if [ "${node_if[node$i]}" == "" ]; then
+        node_if[node$i]=$(ansible node${i} -m setup $ans_opts -i $HOST_INVENTORY_FILE| grep -A 4 ansible_${node_if[node$i]} | grep interface | awk -F \" '{print $4}')
+	sed -i 's/\(.*node'${i}'.*\)monitor_interface=\(.*\)/\1monitor_interface='${node_if[node$i]}'\2/' $HOST_INVENTORY_FILE
+        echo "Assigning default interface for ${node_ip[node$i]} as ${node_if[node$i]}"
+    fi
+done
+
+echo "Contents of $HOST_INVENTORY_FILE:"
+echo "-----------------"
+cat $HOST_INVENTORY_FILE
+echo "-----------------"
+
 # Get IP of all nodes
 rm -rf $HOST_IP_LOG_FILE
 for ((i=1; i<=$#; i++)); do
-    ansible ${node_ip[node$i]} -m setup $ans_opts -i $HOST_INVENTORY_FILE | grep -A 4 ansible_${node_if[node$i]} | grep address | awk -F \" '{print $4}' >> $HOST_IP_LOG_FILE
+    ansible node$i -m setup $ans_opts -i $HOST_INVENTORY_FILE | grep -A 4 ansible_${node_if[node$i]} | grep address | awk -F \" '{print $4}' >> $HOST_IP_LOG_FILE
 done
 
 # Use netmaster's default ip as service vip
