@@ -28,9 +28,9 @@ for it to work.
 
 ### Step2: Provide executable privileges and run installer script
 - `chmod +x net_demo_installer`
-- Run net_demo_installer script. NOTE: Provide the network interface information on which the IP is configured (as mentioned in Step 6 of pre-requisites):
+- Run net_demo_installer script. NOTE: Provide the network interface information on which the IP is configured (as mentioned in Step 6 of pre-requisites). If no interface is specified, the script determines and uses the default network interface used by ansible:
 
-         `./net_demo_installer <server1_ip_or_dns>:<server1_nw_if> <server2_ip_or_dns>:<server2_nw_if> . . .`
+         `./net_demo_installer <server1_ip_or_dns>[:<server1_nw_if>] <server2_ip_or_dns>[:<server2_nw_if>] . . .`
 - The installer script will ask for username/password if passwordless ssh is not set during the installation
 
 ### Under the hoods
