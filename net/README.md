@@ -17,7 +17,7 @@
 5. It is recommended that you enable passwordless sudo on all servers as well.
    Example set up instructions can be found [here](http://askubuntu.com/questions/192050/how-to-run-sudo-command-with-no-password)
 
-6. Get the ip addresses (dns names work as well) of all the servers
+6. Get the IP addresses (dns names work as well) of all the servers and the network interface on which this IP address is configured
 
 ### Step1: Download the installer script
 Log into one of the servers and download the installer script using the following command:
@@ -28,8 +28,9 @@ for it to work.
 
 ### Step2: Provide executable privileges and run installer script
 - `chmod +x net_demo_installer`
-- Run net_demo_installer script:
-`./net_demo_installer <server_1_ip_or_dns> <server_2_ip_or_dns> . . .`
+- Run net_demo_installer script. NOTE: Provide the network interface information on which the IP is configured (as mentioned in Step 6 of pre-requisites):
+
+         `./net_demo_installer <server1_ip_or_dns>:<server1_nw_if> <server2_ip_or_dns>:<server2_nw_if> . . .`
 - The installer script will ask for username/password if passwordless ssh is not set during the installation
 
 ### Under the hoods
@@ -41,11 +42,9 @@ The installer script performs the following actions:
 - runs the ansible playbook which installs necessary packages and brings up the services
 
 ### Troubleshooting
-This is the first cut of installer script.
 The current limitations of the script are as follows:
+- The installer script is assumed to run from one of the server nodes in the cluster. This approach ensures that the required packages are installed only on the necessary nodes.
 - Connections to the servers are assumed to be on the default ssh port and the default username used is the local hostname
-- IPs are assumed to be on the eth1 interface (as they were ). If you have the IPs set on any other interface [eth{x}], 
-  please replace all occurences of "ansible_eth1" to "ansible_default_ipv4"/"ansible_eth{x}" in the installer script
 
 The script generates many files for bookkeeping during the installation procedure. 
 These files can be found under .gen folder in your installer directory. 

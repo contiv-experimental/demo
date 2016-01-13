@@ -11,6 +11,22 @@ ENV_FILE="./.gen/env.json"
 ANSIBLE_SITE_FILE="./ansible/site.yml"
 NETPLUGIN_HOSTGROUP="netplugin-node"
 
+num_nodes=$#
+declare -A node_if
+declare -A node_ip
+
+# Function to parse the arguments
+function ParseArguments {
+    for ((i=1; i<=$#; i++)); do
+        node_name=node$i
+        node_ip[$node_name]=$(echo ${!i} | cut -f1 -d:)
+        node_if[$node_name]=eth0
+        if echo ${!i} | grep ":" > /dev/null; then
+            node_if[$node_name]=$(echo ${!i} | cut -f2 -d:)
+        fi
+    done
+}
+
 # Function to get user confirmation to proceed
 function ConfirmPrompt {
   while true; do
@@ -34,7 +50,8 @@ function GenerateInventoryFile {
     echo "[$NETPLUGIN_HOSTGROUP]" > $HOST_INVENTORY_FILE
     echo "Writing to file for $# hosts"
     for ((i=1; i<=$#; i++)); do
-        echo "node$i ansible_ssh_host=${!i}" >> $HOST_INVENTORY_FILE
+        node_name=node$i
+        echo "${node_name} ansible_ssh_host=${node_ip[$node_name]} monitor_interface=${node_if[$node_name]}" >> $HOST_INVENTORY_FILE
     done
 }
 
@@ -56,13 +73,16 @@ fi
 
 ans_opts=
 
+# Parse the arguments to fetch IP and interface information
+ParseArguments $@
+
 echo " "
 echo "        ==Contiv Netplugin Demo Installer=="
 echo " "
 echo "Netplugin Cluster will be set up on the following servers: "
 echo " "
 for ((i=1; i<=$#; i++)); do
-    echo "  ${!i}  "
+    echo "  ${node_ip[node$i]}  "
 done
 echo " "
 echo "IMPORTANT: You need to specify ALL hosts you're adding to the cluster"
@@ -187,13 +207,20 @@ echo "-----------------"
 
 # Get IP of all nodes
 rm -rf $HOST_IP_LOG_FILE
-ansible $NETPLUGIN_HOSTGROUP -m setup $ans_opts -i $HOST_INVENTORY_FILE | grep -A 4 ansible_eth1 | grep address | awk -F \" '{print $4}' >> $HOST_IP_LOG_FILE
-# Use netmaster's default ip as service vip
-svc_vip=$(ansible node1 -m setup $ans_opts -i $HOST_INVENTORY_FILE | grep -A 4 ansible_eth1 | grep address | awk -F \" '{print $4}')
-no_proxy=$(sed ':a;N;$!ba;s/\n/,/g' $HOST_IP_LOG_FILE)",127.0.0.1,localhost,netmaster"
-echo '{"env":{"http_proxy":"'$http_proxy'", "HTTP_PROXY":"'$http_proxy'", "https_proxy":"'$https_proxy'", "no_proxy":"'$no_proxy'"}, "monitor_interface": "eth1", "etcd_peers_group": '"\"$NETPLUGIN_HOSTGROUP\""', "service_vip": '"\"$svc_vip\""'}' > $ENV_FILE
-    ansible-playbook $ans_opts -i $HOST_INVENTORY_FILE  -e "`cat $ENV_FILE`" $ANSIBLE_SITE_FILE
+for ((i=1; i<=$#; i++)); do
+    ansible ${node_ip[node$i]} -m setup $ans_opts -i $HOST_INVENTORY_FILE | grep -A 4 ansible_${node_if[node$i]} | grep address | awk -F \" '{print $4}' >> $HOST_IP_LOG_FILE
+done
 
+# Use netmaster's default ip as service vip
+master_node=node1
+svc_vip=$(ansible $master_node -m setup $ans_opts -i $HOST_INVENTORY_FILE | grep -A 4 ansible_${node_if[$master_node]} | grep address | awk -F \" '{print $4}')
+no_proxy=$(sed ':a;N;$!ba;s/\n/,/g' $HOST_IP_LOG_FILE)",127.0.0.1,localhost,netmaster"
+echo '{"env":{"http_proxy":"'$http_proxy'", "HTTP_PROXY":"'$http_proxy'", "https_proxy":"'$https_proxy'", "no_proxy":"'$no_proxy'"}, "etcd_peers_group": '"\"$NETPLUGIN_HOSTGROUP\""', "service_vip": '"\"$svc_vip\""'}' > $ENV_FILE
+
+# Execute ansible-playbook to install the necessary services on the nodes
+ansible-playbook $ans_opts -i $HOST_INVENTORY_FILE  -e "`cat $ENV_FILE`" $ANSIBLE_SITE_FILE
+
+# Verify if the installation is successful by checking status of installed services
 DOCKER_HOST=$(service swarm status | grep "tcp://" | awk '{ print $5 }')
 if [ -z "$DOCKER_HOST" ]; then
   echo "swarm status does not look correct. Please retry install."
