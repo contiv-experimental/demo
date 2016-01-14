@@ -6,7 +6,7 @@
 2. If your servers are behind an http proxy (usually the case in many cisco labs...), you need
    to do "export http_proxy=<proxy url>" and "export https_proxy=<proxy_url>" in your shell
 
-3. You will select and use on server to initate installation on all servers in the cluster.
+3. You will select and use on server to initiate installation on all servers in the cluster.
    Please refrain from running install from multiple servers. Instead, stick to the same server to initiate
    installation.
 
@@ -19,19 +19,38 @@
 
 6. Get the IP addresses (dns names work as well) of all the servers and the network interface on which this IP address is configured
 
-### Step1: Download the installer script
+7. Running in ACI mode requires some additional steps. Please find the necessary APIC configuration steps [here](APIC_setup.md)
+
+### Step 1: Download the installer script
 Log into one of the servers and download the installer script using the following command:
 - `wget https://raw.githubusercontent.com/contiv/demo/master/net/net_demo_installer`
 
 Note that if you are behind a proxy, you may need to set `https_proxy` environment variable
 for it to work.
 
-### Step2: Provide executable privileges and run installer script
-- `chmod +x net_demo_installer`
-- Run net_demo_installer script. NOTE: Provide the network interface information on which the IP is configured (as mentioned in Step 6 of pre-requisites). If no interface is specified, the script determines and uses the default network interface used by ansible:
+### Step 2: Setup cfg.yml
+Create the configuration file and provide information about each server's reachability. 
 
-         `./net_demo_installer <server1_ip_or_dns>[:<server1_nw_if>] <server2_ip_or_dns>[:<server2_nw_if>] . . .`
-- The installer script will ask for username/password if passwordless ssh is not set during the installation
+For more inforamtion refer to the following documents:
+
+   - [APIC_setup.md](APIC_setup.md): Refer this document when running in ACI mode. This document provides all prerequisites and steps for setting up APIC. NOTE: Information obtained in step 7 and 8 in this document is required to fill in the cfg.yml
+   - [Configuration-options.md](Configuration-options.md): More information on various options in configuration file
+   - [sample_cfg.yml](extras/sample_cfg.yml): Sample configuration file
+
+### Step 3: Provide executable privileges and run installer script
+- `chmod +x net_demo_installer`
+
+Run net_demo_installer script. 
+
+#####Installer options:
+         Usage: ./net_demo_installer [OPTIONS]
+         
+         OPTIONS:
+            -c => clear any script related auto-generated files
+            -h => display help
+            -a => run in ACI mode
+
+NOTE: The installer script will ask for username/password if passwordless ssh is not set during the installation
 
 ### Under the hoods
 The installer script performs the following actions:
@@ -40,6 +59,7 @@ The installer script performs the following actions:
 - creates the ansible inventory file 
 - establishes variables necessary for the servers to be provisioned in the appropriate mode
 - runs the ansible playbook which installs necessary packages and brings up the services
+- if running in ACI mode, script downloads some basic containers (web/redis) to get you going
 
 ### Troubleshooting
 The current limitations of the script are as follows:
