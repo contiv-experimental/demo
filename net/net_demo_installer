@@ -50,7 +50,7 @@ function GenerateInventoryFile {
     echo "Writing to file for $# hosts"
     for ((i=1; i<=$#; i++)); do
         node_name=node$i
-        echo "${node_name} ansible_ssh_host=${node_ip[$node_name]} monitor_interface=${node_if[$node_name]}" >> $HOST_INVENTORY_FILE
+        echo "${node_name} ansible_ssh_host=${node_ip[$node_name]} control_interface=${node_if[$node_name]}" >> $HOST_INVENTORY_FILE
     done
 }
 
@@ -203,7 +203,7 @@ echo "-----------------"
 for ((i=1; i<=$#; i++)); do
     if [ "${node_if[node$i]}" == "" ]; then
         node_if[node$i]=$(ansible node${i} -m setup $ans_opts -i $HOST_INVENTORY_FILE| grep -A 4 ansible_${node_if[node$i]} | grep interface | awk -F \" '{print $4}')
-	sed -i 's/\(.*node'${i}'.*\)monitor_interface=\(.*\)/\1monitor_interface='${node_if[node$i]}'\2/' $HOST_INVENTORY_FILE
+	sed -i 's/\(.*node'${i}'.*\)control_interface=\(.*\)/\1control_interface='${node_if[node$i]}'\2/' $HOST_INVENTORY_FILE
         echo "Assigning default interface for ${node_ip[node$i]} as ${node_if[node$i]}"
     fi
 done
