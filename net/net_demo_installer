@@ -202,7 +202,7 @@ echo "-----------------"
 # Assign proper interface if nothing is specified by default
 for ((i=1; i<=$#; i++)); do
     if [ "${node_if[node$i]}" == "" ]; then
-        node_if[node$i]=$(ansible node${i} -m setup $ans_opts -i $HOST_INVENTORY_FILE| grep -A 4 ansible_${node_if[node$i]} | grep interface | awk -F \" '{print $4}')
+        node_if[node$i]=$(ansible node${i} -m setup $ans_opts -i $HOST_INVENTORY_FILE| grep -A 10 ansible_${node_if[node$i]} | grep interface | awk -F \" '{print $4}')
 	sed -i 's/\(.*node'${i}'.*\)control_interface=\(.*\)/\1control_interface='${node_if[node$i]}'\2/' $HOST_INVENTORY_FILE
         echo "Assigning default interface for ${node_ip[node$i]} as ${node_if[node$i]}"
     fi
