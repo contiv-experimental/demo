@@ -19,6 +19,7 @@ NETPLUGIN_HOSTGROUP="netplugin-node"
 CFG_FILE="./cfg.yml"
 
 SAMPLE_CFG_FILE_URL="https://raw.githubusercontent.com/contiv/demo/master/net/extras/sample_cfg.yml"
+SAMPLE_ACI_CFG_FILE_URL="https://raw.githubusercontent.com/contiv/demo/master/net/extras/sample_aci_cfg.yml"
 INVENTORY_GEN_URL="https://raw.githubusercontent.com/contiv/demo/master/net/extras/genInventoryFile.py"
 
 args=( "$@" )
@@ -118,8 +119,12 @@ Please follow the instructions in the README to fill in the details in the confi
 Do you want to generate a sample config file:'
     ConfirmPrompt
 
-    echo "Please fill in the necessary details and rerun the installer again..."
-    $(wget $SAMPLE_CFG_FILE_URL -O $CFG_FILE)
+    echo $'\nPlease fill in the necessary details and rerun the installer again...\n'
+    if [ $network_mode == "ACI" ]; then
+        $(wget $SAMPLE_ACI_CFG_FILE_URL -O $CFG_FILE)
+    else
+        $(wget $SAMPLE_CFG_FILE_URL -O $CFG_FILE)
+    fi
     exit 1
 fi
 

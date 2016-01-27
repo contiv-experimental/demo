@@ -17,3 +17,18 @@
 #      <server2-ip-or-dns>:
 #        control: eth7
 #        data: eth2
+
+##===============================================================
+## APIC Access Info
+
+## Fill in the info and uncomment (quotes are needed)
+#APIC_URL: "https://<apic-server-url>:443"
+#APIC_USERNAME: "admin"
+#APIC_PASSWORD: "password"
+
+## Full path of the leaf nodes connected to your servers.
+## List each node on a new line as shown commented
+#APIC_LEAF_NODES:
+#    - topology/pod-1/node-101
+#    - topology/pod-1/node-102
+##===============================================================
