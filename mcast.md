@@ -73,7 +73,7 @@ $ ifconfig port1 30.1.1.8/24
 ```
 
 #### Step 5: Launch a multicast application
-for eg https://github.com/leslie-wang/py-multicast-example
+-for eg https://github.com/leslie-wang/py-multicast-example
 `$ ./mcast.py -s -i inb01`
 
 #### Step 6: Login to netplugin-node2
