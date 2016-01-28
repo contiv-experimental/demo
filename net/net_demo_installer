@@ -21,6 +21,7 @@ CFG_FILE="./cfg.yml"
 SAMPLE_CFG_FILE_URL="https://raw.githubusercontent.com/contiv/demo/master/net/extras/sample_cfg.yml"
 SAMPLE_ACI_CFG_FILE_URL="https://raw.githubusercontent.com/contiv/demo/master/net/extras/sample_aci_cfg.yml"
 INVENTORY_GEN_URL="https://raw.githubusercontent.com/contiv/demo/master/net/extras/genInventoryFile.py"
+ANSIBLE_SHA_VERSION="2e09f47bacb260f491c947a089c464f309b2e194"
 
 args=( "$@" )
 network_mode="Standalone"
@@ -183,7 +184,6 @@ fi
 if $(cd ansible > /dev/null 2>&1) 
 then
     echo "Ansible repository already exists. Proceeding..."
-    $(cd ..)
 else
     echo "Pulling ansible repository..."
     if ! $(git clone https://github.com/contiv/ansible.git)
@@ -191,6 +191,17 @@ else
         echo "Unable to pull ansible git repository. Please verify git parameters to resolve issue."
         exit 1
     fi
+
+    # Update to the most tested version of ansible
+    cd ansible
+    if [ $? -eq 0 ]
+    then
+        if ! $(git reset --hard ${ANSIBLE_SHA_VERSION} > /dev/null 2>&1)
+        then
+            echo "Reset to tested version of ansible failed. Operating with latest version."
+        fi
+    fi
+    cd ..
 fi
 
 # Prepare ansible for auth expectations
