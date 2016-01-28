@@ -4,7 +4,8 @@ multicast in a contiv network.
 
 ### Steps to run sender and receiver multicast application between containers
 For this experiement we will run 2 containers , one on each VM. We will create a vlan network
-and run a sender and receiver multicast application.
+and run a sender and receiver multicast application. For the purpose of this demo we will be using
+multicast application from https://github.com/leslie-wang/py-multicast-example
 
 #### Step 1: Pull the contiv netplugin workspace from github
 ```
@@ -73,7 +74,6 @@ $ ifconfig port1 30.1.1.8/24
 ```
 
 #### Step 5: Launch a multicast application
--for eg https://github.com/leslie-wang/py-multicast-example
 `$ ./mcast.py -s -i inb01`
 
 #### Step 6: Login to netplugin-node2
