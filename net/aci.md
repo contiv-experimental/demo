@@ -45,11 +45,20 @@ All options listed below for ACI setup are mandatory.
           APIC_PASSWORD: "password"
 
 ###### Information related to leaf nodes
-Full path of the leaf nodes connected to your servers. Use the informtion obtained in Step 8 of [APIC Configuration](ACI_README.md#apic-configuration-fabricaccess-policies) here.
+Full path of the leaf nodes connected to your servers. Use the informtion obtained in Step 8 of [APIC Configuration](aci.md#apic-configuration-fabricaccess-policies) here.
 
         APIC_LEAF_NODES:
         - topology/pod-1/node-101
         - topology/pod-1/node-102
+
+### Running the installer in ACI mode
+To run the installer in ACI mode use the -a option
+
+          ./net_demo_isntaller -a
+
+To restart the services once installed use the -r option. This ensures that the services are restarted in a clean state.
+
+          ./net_demo_isntaller -ar
 
 ### NOTE
 The installer script downloads some basic containers (web/redis) to get you going
