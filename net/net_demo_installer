@@ -157,9 +157,6 @@ for ((i=1; i<=$num_nodes; i++)); do
     echo "  ${node_ip[node$i]}  "
 done
 echo " "
-echo "IMPORTANT: You need to specify ALL hosts you're adding to the cluster"
-echo "           on he command line. Setting them up one at a time is not"
-echo "           supported"
 echo " "
 
 ConfirmPrompt
