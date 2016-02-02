@@ -139,6 +139,13 @@ fi
 # Create folder to hold all generated files
 mkdir .gen > /dev/null 2>&1
 
+# Install python, pip and ansible
+echo "Performing apt-get update, this might take a while..."
+sudo apt-get update
+echo "Installing python, pip and ansible...."
+sudo apt-get install build-essential git python-dev python-pip python-yaml sshpass -y
+sudo -E pip install ansible
+
 echo "Parsing config file..."
 # Generate inventory file
 GenerateInventoryFile
@@ -173,13 +180,6 @@ else
     echo "Need version 15 on this machine"
     exit 1
 fi
-
-# Install python, pip and ansible
-echo "Performing apt-get update, this might take a while..."
-sudo apt-get update
-echo "Installing python, pip and ansible...."
-sudo apt-get install build-essential git python-dev python-pip sshpass -y
-sudo -E pip install ansible
 
 if ! $(which ansible > /dev/null 2>&1)
 then
