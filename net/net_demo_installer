@@ -290,15 +290,13 @@ svc_vip=$(ansible $master_node -m setup $ans_opts -i $HOST_INVENTORY_FILE | grep
 no_proxy=$(sed ':a;N;$!ba;s/\n/,/g' $HOST_IP_LOG_FILE)",127.0.0.1,localhost,netmaster"
 echo '{"env":{"http_proxy":"'$http_proxy'", "HTTP_PROXY":"'$http_proxy'", "https_proxy":"'$https_proxy'", "no_proxy":"'$no_proxy'"}, "etcd_peers_group": '"\"$NETPLUGIN_HOSTGROUP\""', "service_vip": '"\"$svc_vip\""'}' > $ENV_FILE
 
-
-
-
-echo $restart_mode
-if [ $restart_mode == true ]; then
+if $restart_mode; then
     echo "In restart mode"
     echo "Removing containers"
-    docker stop $(docker ps -aq) > /dev/null 2>&1
-    docker rm $(docker ps -aq) > /dev/null 2>&1
+    if ! [ $(docker ps -aq | wc -w) ]; then
+        docker stop $(docker ps -aq) > /dev/null 2>&1
+        docker rm $(docker ps -aq) > /dev/null 2>&1
+    fi
     echo "Stopping all services"
     ansible-playbook $ans_opts -i $HOST_INVENTORY_FILE  -e "`cat $ENV_FILE`" $ANSIBLE_CLEANUP_FILE
 fi
