@@ -19,7 +19,7 @@ class Inventory:
         self.inventoryFile = args[1]
         self.nodeInfoFile = args[2]
         self.networkMode = args[3].lower()
-
+        self.fwdMode = args[4]
     def parseConfigFile(self):
         with open(self.cfgFile) as inFd:
             config = yaml.load(inFd)
@@ -52,8 +52,11 @@ class Inventory:
             outFd.write(var_line)
             var_line = "control_interface={} ".format(connInfo[node]['control'])
             outFd.write(var_line)
-            var_line = "netplugin_if={}\n".format(connInfo[node]['data'])
+            var_line = "netplugin_if={} ".format(connInfo[node]['data'])
             outFd.write(var_line)
+            var_line = "fwd_mode={}\n".format(self.fwdMode)
+            outFd.write(var_line)
+
             self.nodeCount += 1
 
         self.nodeCount -= 1
