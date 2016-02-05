@@ -8,7 +8,7 @@ This documents provides steps to bring up contiv infrastructure in a L3 native v
 
 #What are the recommended topologies ?
 
-<diagram of supported topos>
+-diagram of supported topos
 
 
 #Typical worklow:
@@ -24,10 +24,11 @@ This documents provides steps to bring up contiv infrastructure in a L3 native v
 - Currently only one uplink from the server is supported
 - Currently supported on bare-metals (watch this space for support on VMs soon)
 
- #Supported version
+#Supported version
  
- version number of netplugin, netmaster, netctl 
-
+- version number of netplugin 
+- version number of netmaster
+- version number of netctl
 
 #Steps to bring up a demo cluster with routing capabilites:
 
