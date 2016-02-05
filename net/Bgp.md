@@ -8,7 +8,7 @@ This documents provides steps to bring up contiv infrastructure in a L3 native v
 
 #What are the recommended topologies ?
 
-
+<diagram of supported topos>
 
 
 #Typical worklow:
@@ -18,8 +18,6 @@ This documents provides steps to bring up contiv infrastructure in a L3 native v
 - Add Bgp configuration on the host, to peer with the uplink leaf
 - Bring up containers in thenetwork on the host
 
-
-
 #What are the supported configurations
 
 - Ensure that BGP peering between the host server and the leaf switch is eBGP
@@ -27,6 +25,8 @@ This documents provides steps to bring up contiv infrastructure in a L3 native v
 - Currently supported on bare-metals [watch this space for support on VMs soon]
 
  #Supported version
+ 
+ <version number of netplugin, netmaster, netctl> +
 
 
 #Steps to bring up a demo cluster with routing capabilites:
