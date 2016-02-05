@@ -1,37 +1,37 @@
 This documents provides steps to bring up contiv infrastructure in a L3 native vlan mode. 
 
-What does L3 capabilty facilitate in a Contiv container infrastructure ?
+#What does L3 capabilty facilitate in a Contiv container infrastructure ?
 
 -  Enable communication between containers on different hosts natively using vlan encap 
 -  Enables communication between containers and non containers 
 -  Provides capability for uplink TOR's/Leaf switches to learn containers deployed in the fabric
 
-What are the recommended topologies ?
+#What are the recommended topologies ?
 
 
 
 
-Typical worklow:
-Configure Bgp on the Leaf switches Leaf 1 and Leaf 2 
-Bring up Contiv – netplugin and netmaster
-Create a Vlan network with subnet pool and gateway
-Add Bgp configuration on the host, to peer with the uplink leaf
-Bring up containers in thenetwork on the host
+#Typical worklow:
+- Configure Bgp on the Leaf switches Leaf 1 and Leaf 2 
+- Bring up Contiv – netplugin and netmaster
+- Create a Vlan network with subnet pool and gateway
+- Add Bgp configuration on the host, to peer with the uplink leaf
+- Bring up containers in thenetwork on the host
 
 
 
-What are the supported configurations
+#What are the supported configurations
 
-1) Ensure that BGP peering between the host server and the leaf switch is eBGP
-2) Currently only one uplink from the server is supported. 
-3) Currently supported on bare-metals [watch this space for support on VMs soon]
+- Ensure that BGP peering between the host server and the leaf switch is eBGP
+- Currently only one uplink from the server is supported. 
+- Currently supported on bare-metals [watch this space for support on VMs soon]
 
-FROM SUPPORTED VERSION
+ #Supported version
 
 
-Steps to bring up a demo cluster with routing capabilites:
+#Steps to bring up a demo cluster with routing capabilites:
 
-STEP 0 
+##STEP 0 
 
 Please follow the steps completetly in the link given below. This would enable installation of all the required packages , versions of the binary that would be needed to bring up the contiv infrastrure services. At the end of these steps netplugin , netmaster would be started in routing mode. please start the installer script provide in the link with -l option
 
@@ -39,12 +39,12 @@ Please follow the steps completetly in the link given below. This would enable i
 ```
 ./net_demo_installer -l 
 ```
-STEP 1 
+##STEP 1 
 
 If you are using the sample topology provided above :
 Ensure the following configurations on the switches
 
-Switch1: 
+###Switch1: 
 ```
 router ospf 500
   router-id 80.1.1.1
@@ -81,7 +81,7 @@ ip access-list HOSTS
   10 permit ip any any
 ```
   
-Switch 2:
+###Switch 2:
 
 ```
 feature ospf
@@ -123,7 +123,7 @@ ip access-list HOSTS
   
 ```
 
-STEP 2:
+##STEP 2:
 
 Add the bgp neighbor on each of the contiv hosts 
 ```
@@ -131,7 +131,7 @@ $netctl bgp add contiv144 -router-ip="50.1.1.1/24" --as="65002" --neighbor-as="5
 $netctl bgp add contiv152 -router-ip="60.1.1.3/24" --as="65002" --neighbor-as="500" --neighbor="60.1.1.4"
 ```
 
-STEP 3 :
+##STEP 3 :
 
 Create a network with encap as vlan and start containers in the network
 ```
@@ -143,7 +143,7 @@ docker run -itd --name=web --net=public ubuntu /bin/bash
 docker run -itd --name=web --net=public ubuntu /bin/bash
 docker run -itd --name=web --net=public ubuntu /bin/bash
 ```
-STEP 4:
+##STEP 4:
 
 Login to continer web and redis and verify the ip address has been allocated from the network. 
 ```
@@ -180,7 +180,7 @@ PING 192.168.1.2 (192.168.1.2) 56(84) bytes of data.
 
 ```
 
-STEP 5:
+##STEP 5:
 Ping between the containers
 
 ```
@@ -194,9 +194,7 @@ PING 192.168.1.2 (192.168.1.2) 56(84) bytes of data.
 
 ```
 
-
-
-STEP 6:
+##STEP 6:
 ping between container and a switch. 
 
 ```
