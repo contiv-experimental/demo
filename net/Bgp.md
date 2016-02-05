@@ -32,16 +32,17 @@ This documents provides steps to bring up contiv infrastructure in a L3 native v
 
 #Steps to bring up a demo cluster with routing capabilites:
 
-##STEP 0 
+##STEP 0 : Provision the host nodes with required services
 
-Please follow the prequesite steps completely in the [demo installer] page. This would enable installation of all the required packages , versions of the binary that would be needed to bring up the contiv infrastrure services. At the end of these steps netplugin , netmaster would be started in routing mode. Once the prerequiste is completed please start the installer script. 
+Please follow the [prequesite] and [download] steps in the [demo installer] page. This would enable installation of all the required packages , versions of the binary that would be needed to bring up the contiv infrastrure services. At the end of these steps netplugin , netmaster would be started in routing mode. Once the prerequiste is completed please start the installer script. 
 
 ```
-./net_demo_installer -l 
+$chmod +x net_demo_installer
+$./net_demo_installer -l 
 ```
-
 The net_demo_installer will create a cfg.yaml template file on the first run. 
-cfg.yaml for the demo topology is as show below.
+
+The [cfg.yaml] for the demo topology is as shown below.
 
 ```
 CONNECTION_INFO:
@@ -253,6 +254,9 @@ PING 80.1.1.2 (80.1.1.2) 56(84) bytes of data.
 
 
 [demo installer]: <https://github.com/contiv/demo/tree/master/net>
+[prequesite]: <https://github.com/contiv/demo/tree/master/net#pre-requisites>
+[download]: <https://github.com/contiv/demo/tree/master/net#step-1-download-the-installer-script>
+[cfg.yaml]: <https://github.com/contiv/demo/blob/master/net/extras/sample_cfg.yml>
 
 
 
