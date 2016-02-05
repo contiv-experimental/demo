@@ -183,14 +183,6 @@ lo        Link encap:Local Loopback
           TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
           collisions:0 txqueuelen:0
           RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
-root@084f47e72101:/# ping 192.168.1.2
-PING 192.168.1.2 (192.168.1.2) 56(84) bytes of data.
-64 bytes from 192.168.1.2: icmp_seq=1 ttl=62 time=9.29 ms
-64 bytes from 192.168.1.2: icmp_seq=2 ttl=62 time=0.156 ms
-64 bytes from 192.168.1.2: icmp_seq=3 ttl=62 time=0.139 ms
-64 bytes from 192.168.1.2: icmp_seq=4 ttl=62 time=0.130 ms
-64 bytes from 192.168.1.2: icmp_seq=5 ttl=62 time=0.123 ms
-
 ```
 
 ##STEP 5:
