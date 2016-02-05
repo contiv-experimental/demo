@@ -21,7 +21,7 @@ This documents provides steps to bring up contiv infrastructure in a L3 native v
 #What are the supported configurations
 
 - Ensure that BGP peering between the host server and the leaf switch is eBGP
-- Currently only one uplink from the server is supported. 
+- Currently only one uplink from the server is supported
 - Currently supported on bare-metals [watch this space for support on VMs soon]
 
  #Supported version
