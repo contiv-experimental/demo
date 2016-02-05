@@ -34,15 +34,15 @@ This documents provides steps to bring up contiv infrastructure in a L3 native v
 
 ##STEP 0 
 
-Please follow the steps completetly in the link given below. This would enable installation of all the required packages , versions of the binary that would be needed to bring up the contiv infrastrure services. At the end of these steps netplugin , netmaster would be started in routing mode. please start the installer script provide in the link with -l option
+Please follow the prequesite steps completely in the [demo installer] page. This would enable installation of all the required packages , versions of the binary that would be needed to bring up the contiv infrastrure services. At the end of these steps netplugin , netmaster would be started in routing mode. Once the prerequiste is completed please start the installer script. 
 
-https://github.com/contiv/demo/tree/master/net
 ```
 ./net_demo_installer -l 
 ```
 
-The net_demo_installer will create a cfg.yaml template file. 
+The net_demo_installer will create a cfg.yaml template file on the first run. 
 cfg.yaml for the demo topology is as show below.
+
 ```
 CONNECTION_INFO:
       172.29.205.224:
@@ -53,10 +53,15 @@ CONNECTION_INFO:
         data: eth6
 ```
 
-##STEP 1 
+Rerun the installer after filling up the cfg.yaml. 
+```
+./net_demo_installer -l 
+```
 
-If you are using the sample topology provided above :
-Ensure the following configurations on the switches
+##STEP 1 : Configure the Switches to run BGP
+
+If you are using the sample topology provided above , the following sample configuration could be used.
+
 
 ###Switch1: 
 ```
@@ -137,34 +142,38 @@ ip access-list HOSTS
   
 ```
 
-##STEP 2:
+##STEP 2: Add the bgp neighbor on each of the contiv hosts 
 
-Add the bgp neighbor on each of the contiv hosts 
+On the host where netmaster is running :
 ```
-$netctl bgp add contiv144 -router-ip="50.1.1.1/24" --as="65002" --neighbor-as="500" --neighbor="50.1.1.2"
-$netctl bgp add contiv152 -router-ip="60.1.1.3/24" --as="65002" --neighbor-as="500" --neighbor="60.1.1.4"
+$netctl bgp add host1 -router-ip="50.1.1.1/24" --as="65002" --neighbor-as="500" --neighbor="50.1.1.2"
+$netctl bgp add host2 -router-ip="60.1.1.3/24" --as="65002" --neighbor-as="500" --neighbor="60.1.1.4"
 ```
 
-##STEP 3 :
+##STEP 3: Create a network with encap as vlan and start containers in the network
 
-Create a network with encap as vlan and start containers in the network
+On the host where netmaster is running :
 ```
-netctl network create public --encap="vlan" --subnet=192.168.1.0/24 --gateway=192.168.1.25
-
-Launch 2 containers on each host
+$netctl network create public --encap="vlan" --subnet=192.168.1.0/24 --gateway=192.168.1.25
+```
+On Host 1 :
+```
+$docker run -itd --name=web --net=public ubuntu /bin/bash
+```
+$On Host 2 :
+```
 docker run -itd --name=web --net=public ubuntu /bin/bash
-docker run -itd --name=web --net=public ubuntu /bin/bash
-docker run -itd --name=web --net=public ubuntu /bin/bash
-docker run -itd --name=web --net=public ubuntu /bin/bash
 ```
-##STEP 4:
 
-Login to continer web and redis and verify the ip address has been allocated from the network. 
+##STEP 4: Login to continer and verify the ip address has been allocated from the network. 
+
 ```
-docker ps -a
+$docker ps -a
 CONTAINER ID        IMAGE                          COMMAND             CREATED              STATUS              PORTS               NAMES
 084f47e72101        ubuntu                         "bash"              About a minute ago   Up About a minute                       compassionate_sammet
 0cc23ada5578        skynetservices/skydns:latest   "/skydns"           6 minutes ago        Up 6 minutes        53/tcp, 53/udp      defaultdns
+
+
 root@contiv144:~/src/github.com/contiv/netplugin# docker exec -it 084f47e72101 bash
 root@084f47e72101:/# ifconfig
 eth0      Link encap:Ethernet  HWaddr 02:02:c0:a8:01:03
@@ -186,11 +195,40 @@ lo        Link encap:Local Loopback
           RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
 ```
 
-##STEP 5:
-Ping between the containers
+##STEP 6: Verify that the switches have the container routes
 
 ```
-root@084f47e72101:/# ping 192.168.1.2
+Switch-1# show ip route
+IP Route Table for VRF "default"
+'*' denotes best ucast next-hop
+'**' denotes best mcast next-hop
+'[x/y]' denotes [preference/metric]
+'%<string>' in via output denotes VRF <string>
+
+50.1.1.0/24, ubest/mbest: 1/0, attached
+    *via 50.1.1.2, Vlan1, [0/0], 3d23h, direct
+50.1.1.2/32, ubest/mbest: 1/0, attached
+    *via 50.1.1.2, Vlan1, [0/0], 3d23h, local
+60.1.1.0/24, ubest/mbest: 1/0
+    *via 80.1.1.2, Eth1/44, [110/44], 3d23h, ospf-500, intra
+60.1.1.4/32, ubest/mbest: 1/0
+    *via 80.1.1.2, [1/0], 1w3d, static
+80.1.1.0/24, ubest/mbest: 1/0, attached
+    *via 80.1.1.1, Eth1/44, [0/0], 1w3d, direct
+80.1.1.1/32, ubest/mbest: 1/0, attached
+    *via 80.1.1.1, Eth1/44, [0/0], 1w3d, local
+192.168.1.1/32, ubest/mbest: 1/0
+    *via 50.1.1.1, [20/0], 03:49:24, bgp-500, external, tag 65002
+192.168.1.2/32, ubest/mbest: 1/0
+    *via 60.1.1.3, [200/0], 00:00:02, bgp-500, internal, tag 65002
+192.168.1.3/32, ubest/mbest: 1/0
+    *via 50.1.1.1, [20/0], 03:47:08, bgp-500, external, tag 65002
+```
+
+##STEP 5: Ping between the containers
+
+```
+$root@084f47e72101:/# ping 192.168.1.2
 PING 192.168.1.2 (192.168.1.2) 56(84) bytes of data.
 64 bytes from 192.168.1.2: icmp_seq=1 ttl=62 time=9.29 ms
 64 bytes from 192.168.1.2: icmp_seq=2 ttl=62 time=0.156 ms
@@ -200,11 +238,10 @@ PING 192.168.1.2 (192.168.1.2) 56(84) bytes of data.
 
 ```
 
-##STEP 6:
-ping between container and a switch. 
-
+##STEP 6: Ping between container and a switch
+ 
 ```
-root@084f47e72101:/# ping 80.1.1.2
+$root@084f47e72101:/# ping 80.1.1.2
 PING 80.1.1.2 (80.1.1.2) 56(84) bytes of data.
 64 bytes from 80.1.1.2: icmp_seq=1 ttl=254 time=0.541 ms
 64 bytes from 80.1.1.2: icmp_seq=2 ttl=254 time=0.549 ms
@@ -215,7 +252,7 @@ PING 80.1.1.2 (80.1.1.2) 56(84) bytes of data.
 
 
 
-
+[demo installer]: <https://github.com/contiv/demo/tree/master/net>
 
 
 
