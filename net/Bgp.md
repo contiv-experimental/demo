@@ -16,7 +16,7 @@ This documents provides steps to bring up contiv infrastructure in a L3 native v
 - Bring up Contiv – netplugin and netmaster
 - Create a Vlan network with subnet pool and gateway
 - Add Bgp configuration on the host, to peer with the uplink leaf
-- Bring up containers in thenetwork on the host
+- Bring up containers in the networks created on the host
 
 #What are the supported configurations
 
