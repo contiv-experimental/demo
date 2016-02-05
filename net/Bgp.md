@@ -117,20 +117,56 @@ STEP 2:
 
 Add the bgp neighbor on each of the contiv hosts 
 
-
+$netctl bgp add contiv144 -router-ip="50.1.1.1/24" --as="65002" --neighbor-as="500" --neighbor="50.1.1.2"
+$netctl bgp add contiv152 -router-ip="60.1.1.3/24" --as="65002" --neighbor-as="500" --neighbor="60.1.1.4"
 
 
 STEP 3 :
 
 Create a network with encap as vlan and start containers in the network
 
+netctl network create public --encap="vlan" --subnet=192.168.1.0/24 --gateway=192.168.1.25
 
+Launch 2 containers on each host
+docker run -itd --name=web --net=public ubuntu /bin/bash
+docker run -itd --name=web --net=public ubuntu /bin/bash
+docker run -itd --name=web --net=public ubuntu /bin/bash
+docker run -itd --name=web --net=public ubuntu /bin/bash
 
 STEP 4:
 
 Login to continer web and redis and verify the ip address has been allocated from the network. 
 
+docker ps -a
+CONTAINER ID        IMAGE                          COMMAND             CREATED              STATUS              PORTS               NAMES
+084f47e72101        ubuntu                         "bash"              About a minute ago   Up About a minute                       compassionate_sammet
+0cc23ada5578        skynetservices/skydns:latest   "/skydns"           6 minutes ago        Up 6 minutes        53/tcp, 53/udp      defaultdns
+root@contiv144:~/src/github.com/contiv/netplugin# docker exec -it 084f47e72101 bash
+root@084f47e72101:/# ifconfig
+eth0      Link encap:Ethernet  HWaddr 02:02:c0:a8:01:03
+          inet addr:192.168.1.3  Bcast:0.0.0.0  Mask:255.255.255.0
+          inet6 addr: fe80::2:c0ff:fea8:103/64 Scope:Link
+          UP BROADCAST RUNNING MULTICAST  MTU:1450  Metric:1
+          RX packets:23 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:23 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          RX bytes:2062 (2.0 KB)  TX bytes:2062 (2.0 KB)
 
+lo        Link encap:Local Loopback
+          inet addr:127.0.0.1  Mask:255.0.0.0
+          inet6 addr: ::1/128 Scope:Host
+          UP LOOPBACK RUNNING  MTU:65536  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+root@084f47e72101:/# ping 192.168.1.2
+PING 192.168.1.2 (192.168.1.2) 56(84) bytes of data.
+64 bytes from 192.168.1.2: icmp_seq=1 ttl=62 time=9.29 ms
+64 bytes from 192.168.1.2: icmp_seq=2 ttl=62 time=0.156 ms
+64 bytes from 192.168.1.2: icmp_seq=3 ttl=62 time=0.139 ms
+64 bytes from 192.168.1.2: icmp_seq=4 ttl=62 time=0.130 ms
+64 bytes from 192.168.1.2: icmp_seq=5 ttl=62 time=0.123 ms
 
 
 
@@ -141,7 +177,13 @@ STEP 5:
 Ping between the containers
 
 
-
+root@084f47e72101:/# ping 192.168.1.2
+PING 192.168.1.2 (192.168.1.2) 56(84) bytes of data.
+64 bytes from 192.168.1.2: icmp_seq=1 ttl=62 time=9.29 ms
+64 bytes from 192.168.1.2: icmp_seq=2 ttl=62 time=0.156 ms
+64 bytes from 192.168.1.2: icmp_seq=3 ttl=62 time=0.139 ms
+64 bytes from 192.168.1.2: icmp_seq=4 ttl=62 time=0.130 ms
+64 bytes from 192.168.1.2: icmp_seq=5 ttl=62 time=0.123 ms
 
 
 
@@ -149,6 +191,15 @@ Ping between the containers
 
 STEP 6:
 ping between container and a switch. 
+
+root@084f47e72101:/# ping 80.1.1.2
+PING 80.1.1.2 (80.1.1.2) 56(84) bytes of data.
+64 bytes from 80.1.1.2: icmp_seq=1 ttl=254 time=0.541 ms
+64 bytes from 80.1.1.2: icmp_seq=2 ttl=254 time=0.549 ms
+64 bytes from 80.1.1.2: icmp_seq=3 ttl=254 time=0.551 ms
+64 bytes from 80.1.1.2: icmp_seq=4 ttl=254 time=0.562 ms
+64 bytes from 80.1.1.2: icmp_seq=5 ttl=254 time=0.484 ms
+
 
 
 
