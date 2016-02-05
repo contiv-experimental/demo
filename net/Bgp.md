@@ -35,10 +35,23 @@ This documents provides steps to bring up contiv infrastructure in a L3 native v
 
 Please follow the steps completetly in the link given below. This would enable installation of all the required packages , versions of the binary that would be needed to bring up the contiv infrastrure services. At the end of these steps netplugin , netmaster would be started in routing mode. please start the installer script provide in the link with -l option
 
--------- METION ABOUT INTERFACE
+https://github.com/contiv/demo/tree/master/net
 ```
 ./net_demo_installer -l 
 ```
+
+The net_demo_installer will create a cfg.yaml template file. 
+cfg.yaml for the demo topology is as show below.
+```
+CONNECTION_INFO:
+      172.29.205.224:
+        control: eth1
+        data: eth7
+      172.29.205.255:
+        control: eth1
+        data: eth6
+```
+
 ##STEP 1 
 
 If you are using the sample topology provided above :
