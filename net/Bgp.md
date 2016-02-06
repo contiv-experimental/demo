@@ -180,7 +180,7 @@ CONTAINER ID        IMAGE                          COMMAND             CREATED  
 0cc23ada5578        skynetservices/skydns:latest   "/skydns"           6 minutes ago        Up 6 minutes        53/tcp, 53/udp      defaultdns
 
 
-root@contiv144:~/src/github.com/contiv/netplugin# docker exec -it 084f47e72101 bash
+root@contiv1:~/src/github.com/contiv/netplugin# docker exec -it 084f47e72101 bash
 root@084f47e72101:/# ifconfig
 eth0      Link encap:Ethernet  HWaddr 02:02:c0:a8:01:03
           inet addr:192.168.1.3  Bcast:0.0.0.0  Mask:255.255.255.0
