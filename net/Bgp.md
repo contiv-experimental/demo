@@ -56,6 +56,7 @@ CONNECTION_INFO:
         control: eth1
         data: eth6
 ```
+Note: As shown in the topo diagram data interface should be the uplink interface and not the management interface of the server.
 
 Rerun the installer after filling up the cfg.yaml. 
 ```
