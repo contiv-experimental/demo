@@ -24,7 +24,7 @@ CFG_FILE="./cfg.yml"
 SAMPLE_CFG_FILE_URL="https://raw.githubusercontent.com/contiv/demo/master/net/extras/sample_cfg.yml"
 SAMPLE_ACI_CFG_FILE_URL="https://raw.githubusercontent.com/contiv/demo/master/net/extras/sample_aci_cfg.yml"
 INVENTORY_GEN_URL="https://raw.githubusercontent.com/contiv/demo/master/net/extras/genInventoryFile.py"
-ANSIBLE_SHA_VERSION="d66de22"
+ANSIBLE_SHA_VERSION="64a6efe"
 
 args=( "$@" )
 network_mode="Standalone"
