@@ -90,7 +90,7 @@ interface Ethernet1/44
   ip address 80.1.1.1/24
   ip router ospf 500 area 0.0.0.0
 
-vlan 1,50
+vlan 1
 route-map FH permit 20
   match ip address HOSTS
 
