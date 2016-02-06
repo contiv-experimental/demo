@@ -8,7 +8,7 @@ This documents provides steps to bring up contiv infrastructure in a L3 native v
 
 #What are the recommended topologies ?
 
--diagram of supported topos
+![topo](https://cloud.githubusercontent.com/assets/784144/12862973/26d1136c-cc25-11e5-9451-a266ea033b5e.png)
 
 
 #Typical worklow:
