@@ -151,10 +151,10 @@ ip access-list HOSTS
 
 On the host where netmaster is running :
 ```
-$netctl bgp create contiv1 -router-ip="50.1.1.1/24" --as="65002" --neighbor-as="500" --neighbor="50.1.1.2"
-$netctl bgp create contiv2 -router-ip="60.1.1.3/24" --as="65002" --neighbor-as="500" --neighbor="60.1.1.4"
+$netctl bgp create Contiv1 -router-ip="50.1.1.1/24" --as="65002" --neighbor-as="500" --neighbor="50.1.1.2"
+$netctl bgp create Contiv2 -router-ip="60.1.1.3/24" --as="65002" --neighbor-as="500" --neighbor="60.1.1.4"
 ```
-where contiv1 and contiv2 are the hostnames of the servers shown in the topology.
+where Contiv1 and Contiv2 are the hostnames of the servers shown in the topology.
 
 ##STEP 3: Create a network with encap as vlan and start containers in the network
 
@@ -162,11 +162,11 @@ On the host where netmaster is running :
 ```
 $netctl network create public --encap="vlan" --subnet=192.168.1.0/24 --gateway=192.168.1.25
 ```
-On contiv1 :
+On Contiv1 :
 ```
 $docker run -itd --name=web --net=public ubuntu /bin/bash
 ```
-$On contiv2 :
+On Contiv2 :
 ```
 docker run -itd --name=web --net=public ubuntu /bin/bash
 ```
