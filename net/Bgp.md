@@ -25,10 +25,15 @@ This documents provides steps to bring up contiv infrastructure in a L3 native v
 - Currently supported on bare-metals (watch this space for support on VMs soon)
 
 #Supported version
- 
-- version number of netplugin 
-- version number of netmaster
-- version number of netctl
+
+This document would be applicable starting from the following version:
+
+```
+Version: v0.1-02-06-2016.14-42-05.UTC
+GitCommit: 392e0a7
+BuildTime: 02-06-2016.14-42-05.UTC
+```
+
 
 #Steps to bring up a demo cluster with routing capabilites:
 
