@@ -1,6 +1,6 @@
 ##DIY Guide to setup Contiv Networking in ACI setup
 
-This document mentions the steps/pre-requisites required to setup the cluster in ACI mode. Note that the steps listed here are in addition to the steps mentioned in the [general README](../README.md).
+This document mentions the steps/pre-requisites required to setup the cluster in ACI mode. Note that the steps listed here are in addition to the steps mentioned in the [general README](https://github.com/contiv/demo/tree/master/net/README.md).
 
 ### Pre-requisites for ACI setup
 
@@ -32,9 +32,9 @@ Contiv currently uses vlans starting from 100. Please make sure that a block of 
 
 ### Additional information in the cfg.yml
 
-Sample cfg.yml for ACI setup: [sample_aci_cfg.yml](../extras/sample_aci_cfg.yml)
+Sample cfg.yml for ACI setup: [sample_aci_cfg.yml](https://github.com/contiv/demo/tree/master/net/extras/sample_aci_cfg.yml)
 
-Apart from providing the usual information in the cfg.yml (as described [here](../README.md#information-in-cfgyml)), the following additional details are required to provide access information to the APIC and the leaf(s) connected to the ACI topology.
+Apart from providing the usual information in the cfg.yml (as described [here](https://github.com/contiv/demo/tree/master/net/README.md#information-in-cfgyml)), the following additional details are required to provide access information to the APIC and the leaf(s) connected to the ACI topology.
 
 ##### ACI setup Info
 All options listed below for ACI setup are mandatory.
