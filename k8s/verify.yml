@@ -1,0 +1,41 @@
+---
+# This playbook verifies the cluster set up
+
+- hosts: all
+  sudo: yes
+
+  tasks:
+
+  - name: Verify | ping control n/w
+    shell: ping "{{ hostvars['k8master']['name'] }}" -c 3 -W 1
+
+  - name: Verify | contiv etcd 
+    shell: etcdctl ls /contiv.io
+
+- hosts: masters
+  sudo: yes
+
+  tasks:
+
+  - name: Verify | apiserver status
+    shell: service kube-apiserver status | grep running
+
+  - name: Verify | controller-manager status
+    shell: service kube-controller-manager status | grep running
+
+  - name: Verify | scheduler status
+    shell: service kube-scheduler status | grep running
+
+  - name: Verify | netmaster status
+    shell: service netmaster status | grep running
+
+- hosts: nodes
+  sudo: yes
+
+  tasks:
+
+  - name: Verify | netplugin status
+    shell: service netplugin status | grep running
+
+  - name: Verify | kubelet status
+    shell: service kubelet status | grep running
