@@ -1,0 +1,130 @@
+---
+# This playbook prepares a machine for cluster setup
+
+- hosts: all
+  sudo: yes
+  vars:
+    etc_host_entries: "{{ lookup('file', '.etc_hosts') }}"
+    ssh_username: admin
+
+  tasks:
+
+  - name: Setup | authorized key upload
+    authorized_key: user="{{ ssh_username }}"
+      key="{{ lookup('file', 'id_rsa.pub') }}"
+      path='/home/"{{ ssh_username }}"/.ssh/authorized_keys'
+      manage_dir=no
+    tags:
+      - ssh_key
+
+  - name: Setup | hostname
+    hostname: name="{{ name }}"
+
+  - name: Setup | clean up /etc/hosts
+    lineinfile: dest=/etc/hosts line="{{ item }}" state=absent
+    with_items: "{{ etc_host_entries }}"
+    tags:
+      - etc_hosts
+
+  - name: Setup | update /etc/hosts
+    lineinfile: dest=/etc/hosts line="{{ item }}" state=present
+    with_items: "{{ etc_host_entries }}"
+    tags:
+      - etc_hosts
+
+  - name: Setup | configure control_ip
+    shell: ifconfig "{{ contiv_control_if }}" "{{ contiv_control_ip }}"/24
+    tags:
+      - if_cfg
+
+  - name: Setup | Make control_if up
+    shell: ifconfig "{{ contiv_control_if }}" up
+    tags:
+      - if_cfg
+
+  - name: Setup | configure data_ip
+    shell: ifconfig "{{ contiv_network_if }}" "{{ contiv_network_ip }}"/24
+    tags:
+      - if_cfg
+
+  - name: Setup | Make data_if up
+    shell: ifconfig "{{ contiv_network_if }}" up
+    tags:
+      - if_cfg
+
+  - name: Setup | Flush iptables
+    shell: iptables --flush
+    tags:
+      - stop_fw
+
+  - name: Setup | Disable firewalld
+    service: name=firewalld state=stopped
+    tags:
+      - stop_fw
+
+  - name: Docker Storage | stop docker
+    service: name=docker state=stopped
+    tags:
+      - docker_mnt_fix
+
+  - name: Docker Storage | configure docker-storage-setup
+    lineinfile: dest=/etc/sysconfig/docker-storage-setup line="DEVS=\"/dev/sdb\""
+    tags:
+      - docker_mnt_fix
+    
+  - name: Docker Storage | remove /var/lib/docker
+    file: path=/var/lib/docker state=absent
+    tags:
+      - docker_mnt_fix
+
+  - name: Docker Storage | run docker-storage-setup
+    shell: docker-storage-setup
+    tags:
+      - docker_mnt_fix
+
+  - name: stop etcd
+    service: name=etcd state=stopped
+    tags:
+      - etcd_uninstall
+    
+  - name: Unistall etcd
+    yum: name=etcd state=removed
+    tags:
+      - etcd_uninstall
+    
+  - name: Remove /var/lib/etcd/
+    file: path=/var/lib/etcd state=absent
+    tags:
+      - etcd_uninstall
+
+  - name: Verify | ping control n/w
+    shell: ping "{{ hostvars['k8master']['name'] }}" -c 3 -W 1
+    tags:
+      - verify
+
+- hosts: masters
+  sudo: yes
+
+  tasks:
+
+  - name: stop kube master services
+    service: name="{{ item }}" state=stopped
+    with_items:
+     - kube-scheduler
+     - kube-apiserver
+     - kube-kube-controller-manager
+    tags:
+      - stop
+
+- hosts: nodes
+  sudo: yes
+
+  tasks:
+
+  - name: stop node services
+    service: name="{{ item }}" state=stopped
+    with_items:
+     - kubelet
+     - docker
+    tags:
+      - stop
