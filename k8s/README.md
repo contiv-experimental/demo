@@ -11,7 +11,7 @@ to run the following steps.
 
 ###Step 1 Clone this repo
 ```
-git clone https://github.com/jojimt/demo -b k8s
+git clone https://github.com/contiv/demo
 ```
 
 ###Step 2 Clone the contrib repo
