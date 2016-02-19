@@ -301,7 +301,21 @@ done
 master_node=node1
 svc_vip=$(ansible $master_node -m setup $ans_opts -i $HOST_INVENTORY_FILE | grep -A 4 ansible_${node_if[$master_node]} | grep address | awk -F \" '{print $4}')
 no_proxy=$(sed ':a;N;$!ba;s/\n/,/g' $HOST_IP_LOG_FILE)",127.0.0.1,localhost,netmaster"
-echo '{"env":{"http_proxy":"'$http_proxy'", "HTTP_PROXY":"'$http_proxy'", "https_proxy":"'$https_proxy'", "no_proxy":"'$no_proxy'"}, "etcd_peers_group": '"\"$NETPLUGIN_HOSTGROUP\""', "service_vip": '"\"$svc_vip\""'}' > $ENV_FILE
+env=$(cat << EOF
+{
+  "env":{
+    "http_proxy":"${http_proxy}",
+    "HTTP_PROXY":"${http_proxy}",
+    "https_proxy":"${https_proxy}",
+    "no_proxy":"{$no_proxy}"
+  },
+  "etcd_peers_group": "${NETPLUGIN_HOSTGROUP}",
+  "service_vip": "${svc_vip}",
+  "validate_certs": "no"
+}
+EOF
+)
+echo ${env} > $ENV_FILE
 
 if $restart_mode; then
     echo "In restart mode"
