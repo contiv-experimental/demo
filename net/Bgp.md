@@ -262,11 +262,17 @@ PING 80.1.1.2 (80.1.1.2) 56(84) bytes of data.
 ```
 
 
+##Policy support
+
+For steps to apply policies supported in contiv networking. Please follow the steps in [Contiv Policies]
+
 
 [demo installer]: <https://github.com/contiv/demo/tree/master/net>
 [prequesite]: <https://github.com/contiv/demo/tree/master/net#pre-requisites>
 [download]: <https://github.com/contiv/demo/tree/master/net#step-1-download-the-installer-script>
 [cfg.yaml]: <https://github.com/contiv/demo/blob/master/net/extras/sample_cfg.yml>
+[Contiv Policies]: <http://contiv.github.io/docs/3_netplugin.html>
+
 
 
 
