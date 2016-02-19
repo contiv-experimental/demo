@@ -25,7 +25,7 @@ INTERACTIVE_MODE=${INTERACTIVE_MODE:-"yes"}
 SAMPLE_CFG_FILE_URL="https://raw.githubusercontent.com/contiv/demo/master/net/extras/sample_cfg.yml"
 SAMPLE_ACI_CFG_FILE_URL="https://raw.githubusercontent.com/contiv/demo/master/net/extras/sample_aci_cfg.yml"
 INVENTORY_GEN_URL="https://raw.githubusercontent.com/contiv/demo/master/net/extras/genInventoryFile.py"
-ANSIBLE_SHA_VERSION="afc98ce"
+ANSIBLE_SHA_VERSION=${ANSIBLE_SHA_VERSION:-"31739f7729d52ff994bc73f0267dd5362cfeba3c"}
 
 args=( "$@" )
 network_mode="Standalone"
@@ -197,34 +197,29 @@ else
     exit 1
 fi
 
-if ! $(which ansible > /dev/null 2>&1)
-then
+if [ "$(which ansible)" == "" ]; then
     echo "Fatal: ansible installation failed!\n"
     exit 1
 fi
 
 # Check and pull ansible repository
-if $(cd ansible > /dev/null 2>&1)
-then
+if [ -d "ansible" ]; then
     echo "Ansible repository already exists. Proceeding..."
 else
     echo "Pulling ansible repository..."
-    if ! $(git clone https://github.com/contiv/ansible.git)
-    then
+    if [ ! $(git clone https://github.com/contiv/ansible.git) ]; then
         echo "Unable to pull ansible git repository. Please verify git parameters to resolve issue."
         exit 1
     fi
 
-    # Update to the most tested version of ansible
-    cd ansible
-    if [ $? -eq 0 ]
-    then
-        if ! $(git reset --hard ${ANSIBLE_SHA_VERSION} > /dev/null 2>&1)
-        then
+    # Update to the provided sha1 of ansible repo, if one is provided
+    if [ "${ANSIBLE_SHA_VERSION}" != "" ]; then
+        cd ansible
+        if [ ! $(git reset --hard ${ANSIBLE_SHA_VERSION} > /dev/null 2>&1) ]; then
             echo "Reset to tested version of ansible failed. Operating with latest version."
         fi
+        cd ..
     fi
-    cd ..
 fi
 
 # Prepare ansible for auth expectations
