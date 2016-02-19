@@ -202,25 +202,22 @@ if [ "$(which ansible)" == "" ]; then
     exit 1
 fi
 
+set -xe
 # Check and pull ansible repository
 if [ -d "ansible" ]; then
-    echo "Ansible repository already exists. Proceeding..."
+    cd ansible
+    git pull --rebase origin 
+    cd ..
 else
-    echo "Pulling ansible repository..."
-    if [ ! $(git clone https://github.com/contiv/ansible.git) ]; then
-        echo "Unable to pull ansible git repository. Please verify git parameters to resolve issue."
-        exit 1
-    fi
-
-    # Update to the provided sha1 of ansible repo, if one is provided
-    if [ "${ANSIBLE_SHA_VERSION}" != "" ]; then
-        cd ansible
-        if [ ! $(git reset --hard ${ANSIBLE_SHA_VERSION} > /dev/null 2>&1) ]; then
-            echo "Reset to tested version of ansible failed. Operating with latest version."
-        fi
-        cd ..
-    fi
+    git clone https://github.com/contiv/ansible.git
 fi
+# Update to the provided sha1 of ansible repo, if one is provided
+if [ "${ANSIBLE_SHA_VERSION}" != "latest" ]; then
+    cd ansible
+    git reset --hard ${ANSIBLE_SHA_VERSION}
+    cd ..
+fi
+set +xe
 
 # Prepare ansible for auth expectations
 echo "\
