@@ -1,7 +1,7 @@
 ## DIY Guide for Contiv Networking
 
 ### Pre-requisites
-1. You need Ubuntu 15.04 or higher on each of your servers used for the Contiv cluster
+1. You need Ubuntu 15 or Centos 7 on each of your servers used for the Contiv cluster
 
 2. If your servers are behind an http proxy (usually the case in many cisco labs...), you need
    to do "export http_proxy=<proxy url>" and "export https_proxy=<proxy_url>" in your shell
