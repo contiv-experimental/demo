@@ -359,7 +359,7 @@ env=$(cat << EOF
     "http_proxy":"${http_proxy}",
     "HTTP_PROXY":"${http_proxy}",
     "https_proxy":"${https_proxy}",
-    "no_proxy":"{$no_proxy}"
+    "no_proxy":"${no_proxy}"
   },
   "etcd_peers_group": "${NETPLUGIN_HOSTGROUP}",
   "service_vip": "${svc_vip}",
@@ -393,14 +393,23 @@ if [ $network_mode == "ACI" ]; then
 fi
 
 # Verify if the installation is successful by checking status of installed services
-DOCKER_HOST=$(service swarm status | grep "tcp://" | awk '{ print $5 }')
-if [ -z "$DOCKER_HOST" ]; then
+set -x
+# validate swarm container is running
+DOCKER_HOST=$(sudoExec docker -H unix:///var/run/docker.sock ps --no-trunc -f name=swarm-manager | grep "\-H \:[0-9]*" -o | awk '{print $2}')
+if [ -z "${DOCKER_HOST}" ]; then
   echo "swarm status does not look correct. Please retry install."
-else
-  echo "Install complete."
-  echo "========================================================="
-  echo " "
-  echo "Please export DOCKER_HOST=$DOCKER_HOST in your shell before proceeding"
-  echo " "
-  echo "========================================================="
+  exit 1
 fi
+# validate swarm cluster membership
+if [ $(sudoExec docker -H ${DOCKER_HOST} info | grep Nodes: | awk '{print $2}') != "${num_nodes}" ]; then
+    echo "swarm cluster doesn't seem to be formed. Please cleanup using -r flag and retry install."
+    exit 1
+fi
+set +x
+
+echo "Install complete."
+echo "========================================================="
+echo " "
+echo "Please export DOCKER_HOST=${DOCKER_HOST} in your shell before proceeding"
+echo " "
+echo "========================================================="
