@@ -141,6 +141,10 @@ function CheckOSTypeAndVersion {
     fi
 }
 
+function sudoExec() {
+    sudo -E $@
+}
+
 set -x
 # Check OS type and version
 CheckOSTypeAndVersion
@@ -148,15 +152,15 @@ CheckOSTypeAndVersion
 OS_TYPE=$(GetLinuxOS)
 if [[ ${OS_TYPE} =~ ^Ubuntu ]]; then
     # Install python, pip and ansible
-    sudo apt-get update
-    sudo apt-get install wget git build-essential python-dev software-properties-common -y
-    sudo apt-add-repository -y ppa:ansible/ansible
-    sudo apt-get install -y ansible
+    sudoExec apt-get update
+    sudoExec apt-get install wget git build-essential python-dev software-properties-common -y
+    sudoExec apt-add-repository -y ppa:ansible/ansible
+    sudoExec apt-get install -y ansible
 fi
 
 if  [[ ${OS_TYPE} =~ ^CentOS ]]; then
-    sudo yum install -y epel-release git wget
-    sudo yum install -y http://ftp.gnome.org/mirror/fedora/epel/testing/7/x86_64/a/ansible-2.0.0.2-1.el7.noarch.rpm
+    sudoExec yum install -y epel-release epel-testing git wget
+    sudoExec yum install -y ansible
 fi
 
 if [ "$(which ansible)" == "" ]; then
@@ -330,7 +334,7 @@ if [ ! -z "$ans_opts" ]; then
 fi
 
 echo ""
-echo "Ansible access and Ubuntu version verification completed on all hosts"
+echo "Ansible access and OS version verification completed on all hosts"
 set -e
 
 echo "-----------------"
@@ -369,8 +373,8 @@ if $restart_mode; then
     echo "In restart mode"
     echo "Removing containers"
     if ! [ $(docker ps -aq | wc -w) ]; then
-        docker stop $(docker ps -aq) > /dev/null 2>&1
-        docker rm $(docker ps -aq) > /dev/null 2>&1
+        sudoExec docker stop $(docker ps -aq) > /dev/null 2>&1
+        sudoExec docker rm $(docker ps -aq) > /dev/null 2>&1
     fi
     echo "Stopping all services"
     ansible-playbook $ans_opts -i $HOST_INVENTORY_FILE  -e "`cat $ENV_FILE`" $ANSIBLE_CLEANUP_FILE
@@ -382,10 +386,10 @@ ansible-playbook $ans_opts -i $HOST_INVENTORY_FILE  -e "`cat $ENV_FILE`" $ANSIBL
 
 # Bring up containers for demo when provisioning in ACI mode
 if [ $network_mode == "ACI" ]; then
-    docker pull jainvipin/web
-    docker tag -f jainvipin/web web
-    docker pull jainvipin/redis
-    docker tag -f jainvipin/redis redis
+    sudoExec docker pull jainvipin/web
+    sudoExec docker tag -f jainvipin/web web
+    sudoExec docker pull jainvipin/redis
+    sudoExec docker tag -f jainvipin/redis redis
 fi
 
 # Verify if the installation is successful by checking status of installed services
