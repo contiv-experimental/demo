@@ -25,7 +25,7 @@ INTERACTIVE_MODE=${INTERACTIVE_MODE:-"yes"}
 SAMPLE_CFG_FILE_URL="https://raw.githubusercontent.com/contiv/demo/master/net/extras/sample_cfg.yml"
 SAMPLE_ACI_CFG_FILE_URL="https://raw.githubusercontent.com/contiv/demo/master/net/extras/sample_aci_cfg.yml"
 INVENTORY_GEN_URL="https://raw.githubusercontent.com/contiv/demo/master/net/extras/genInventoryFile.py"
-ANSIBLE_SHA_VERSION=${ANSIBLE_SHA_VERSION:-"31739f7729d52ff994bc73f0267dd5362cfeba3c"}
+ANSIBLE_SHA_VERSION=${ANSIBLE_SHA_VERSION:-"81ce947f845126568a0107cf5add8a5ee1019172"}
 
 args=( "$@" )
 network_mode="Standalone"
