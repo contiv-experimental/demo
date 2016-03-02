@@ -14,13 +14,13 @@ function print_output {
 }
 
 @test "fresh install netplugin - aci mode " {
-  run ${installer} -a
+  run timeout 5m ${installer} -a
   print_output
   [ "${status}" -eq 0 ]
 }
 
 @test "clean and reinstall netplugin - aci mode" {
-  run ${installer} -ar
+  run timeout 5m ${installer} -ar
   print_output
   [ "${status}" -eq 0 ]
 }
