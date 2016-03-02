@@ -25,7 +25,7 @@ INTERACTIVE_MODE=${INTERACTIVE_MODE:-"yes"}
 SAMPLE_CFG_FILE_URL="https://raw.githubusercontent.com/contiv/demo/master/net/extras/sample_cfg.yml"
 SAMPLE_ACI_CFG_FILE_URL="https://raw.githubusercontent.com/contiv/demo/master/net/extras/sample_aci_cfg.yml"
 INVENTORY_GEN_URL="https://raw.githubusercontent.com/contiv/demo/master/net/extras/genInventoryFile.py"
-ANSIBLE_SHA_VERSION=${ANSIBLE_SHA_VERSION:-"31739f7729d52ff994bc73f0267dd5362cfeba3c"}
+ANSIBLE_SHA_VERSION=${ANSIBLE_SHA_VERSION:-"81ce947f845126568a0107cf5add8a5ee1019172"}
 
 args=( "$@" )
 network_mode="Standalone"
@@ -141,6 +141,10 @@ function CheckOSTypeAndVersion {
     fi
 }
 
+function sudoExec() {
+    sudo -E $@
+}
+
 set -x
 # Check OS type and version
 CheckOSTypeAndVersion
@@ -148,15 +152,15 @@ CheckOSTypeAndVersion
 OS_TYPE=$(GetLinuxOS)
 if [[ ${OS_TYPE} =~ ^Ubuntu ]]; then
     # Install python, pip and ansible
-    sudo apt-get update
-    sudo apt-get install wget git build-essential python-dev software-properties-common -y
-    sudo apt-add-repository -y ppa:ansible/ansible
-    sudo apt-get install -y ansible
+    sudoExec apt-get update
+    sudoExec apt-get install wget git build-essential python-dev software-properties-common -y
+    sudoExec apt-add-repository -y ppa:ansible/ansible
+    sudoExec apt-get install -y ansible
 fi
 
 if  [[ ${OS_TYPE} =~ ^CentOS ]]; then
-    sudo yum install -y epel-release git wget
-    sudo yum install -y http://ftp.gnome.org/mirror/fedora/epel/testing/7/x86_64/a/ansible-2.0.0.2-1.el7.noarch.rpm
+    sudoExec yum install -y epel-release epel-testing git wget
+    sudoExec yum install -y ansible
 fi
 
 if [ "$(which ansible)" == "" ]; then
@@ -330,7 +334,7 @@ if [ ! -z "$ans_opts" ]; then
 fi
 
 echo ""
-echo "Ansible access and Ubuntu version verification completed on all hosts"
+echo "Ansible access and OS version verification completed on all hosts"
 set -e
 
 echo "-----------------"
@@ -355,7 +359,7 @@ env=$(cat << EOF
     "http_proxy":"${http_proxy}",
     "HTTP_PROXY":"${http_proxy}",
     "https_proxy":"${https_proxy}",
-    "no_proxy":"{$no_proxy}"
+    "no_proxy":"${no_proxy}"
   },
   "etcd_peers_group": "${NETPLUGIN_HOSTGROUP}",
   "service_vip": "${svc_vip}",
@@ -369,8 +373,8 @@ if $restart_mode; then
     echo "In restart mode"
     echo "Removing containers"
     if ! [ $(docker ps -aq | wc -w) ]; then
-        docker stop $(docker ps -aq) > /dev/null 2>&1
-        docker rm $(docker ps -aq) > /dev/null 2>&1
+        sudoExec docker stop $(docker ps -aq) > /dev/null 2>&1
+        sudoExec docker rm $(docker ps -aq) > /dev/null 2>&1
     fi
     echo "Stopping all services"
     ansible-playbook $ans_opts -i $HOST_INVENTORY_FILE  -e "`cat $ENV_FILE`" $ANSIBLE_CLEANUP_FILE
@@ -382,21 +386,30 @@ ansible-playbook $ans_opts -i $HOST_INVENTORY_FILE  -e "`cat $ENV_FILE`" $ANSIBL
 
 # Bring up containers for demo when provisioning in ACI mode
 if [ $network_mode == "ACI" ]; then
-    docker pull jainvipin/web
-    docker tag -f jainvipin/web web
-    docker pull jainvipin/redis
-    docker tag -f jainvipin/redis redis
+    sudoExec docker pull jainvipin/web
+    sudoExec docker tag -f jainvipin/web web
+    sudoExec docker pull jainvipin/redis
+    sudoExec docker tag -f jainvipin/redis redis
 fi
 
 # Verify if the installation is successful by checking status of installed services
-DOCKER_HOST=$(service swarm status | grep "tcp://" | awk '{ print $5 }')
-if [ -z "$DOCKER_HOST" ]; then
+set -x
+# validate swarm container is running
+DOCKER_HOST=$(sudoExec docker -H unix:///var/run/docker.sock ps --no-trunc -f name=swarm-manager | grep "\-H \:[0-9]*" -o | awk '{print $2}')
+if [ -z "${DOCKER_HOST}" ]; then
   echo "swarm status does not look correct. Please retry install."
-else
-  echo "Install complete."
-  echo "========================================================="
-  echo " "
-  echo "Please export DOCKER_HOST=$DOCKER_HOST in your shell before proceeding"
-  echo " "
-  echo "========================================================="
+  exit 1
 fi
+# validate swarm cluster membership
+if [ $(sudoExec docker -H ${DOCKER_HOST} info | grep Nodes: | awk '{print $2}') != "${num_nodes}" ]; then
+    echo "swarm cluster doesn't seem to be formed. Please cleanup using -r flag and retry install."
+    exit 1
+fi
+set +x
+
+echo "Install complete."
+echo "========================================================="
+echo " "
+echo "Please export DOCKER_HOST=${DOCKER_HOST} in your shell before proceeding"
+echo " "
+echo "========================================================="
