@@ -1,6 +1,6 @@
 #!/bin/bash
 
-USAGE="prepare.sh <ssh_username>
+USAGE="prepare.sh <ssh_username>"
 if [ $# -lt 1 ]; then
     echo $USAGE
     exit 1
