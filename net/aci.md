@@ -11,20 +11,19 @@ Contiv currently uses vlans starting from 100. Please make sure that a block of 
 
 #### APIC Configuration (Fabric/Access Policies)
 
-    1. Create a physical domain named "allvlans" (For now, this name is hard-coded. This will be made configurable/generic in
-       a follow on release.).
+    1. Create a VLAN Pool under "Fabric" -> "Access Policies" -> "Pools" -> "VLAN". Set allocation mode to
+       "Static Allocation".
 
-    2. Create a vlan pool with a block of vlans starting with 100 as described above. Set allocation mode to "Static Allocation"
-       and associate with the "allvlans" physical domain.
+    2. Create a physical domain under "Fabric" -> "Access Policies" -> "Physical and External Domains" -> "Physical Domains"
 
-    3. Create an Attachable Access Entity Profile(AAEP) and associate with the "allvlans" physical domain.
+    3. Create an Attachable Access Entity Profile(AAEP) and associate with the physical domain created in step #2.
 
-    4. Create a Policy Group (under Interface Policies) and specify the AAEP created in the previous step.
+    4. Create a Policy Group (under Interface Policies) and specify the AAEP created in step #3.
 
     5. Create an Interface Profile and specify the physical interfaces connected from your ToR(s) to the bare metal servers.
        You can create separate Interface Profiles for individual ToRs if you like.
 
-    6. Create a Switch Profile (Switch Policies/Profiles) and specify the appropriate interface profile created in step 4.
+    6. Create a Switch Profile (Switch Policies/Profiles) and specify the appropriate interface profile created in step 5.
 
     7. Make a note of the full node name of the ToRs you have connected to your servers.
 
@@ -43,6 +42,13 @@ All options listed below for ACI setup are mandatory.
           APIC_URL: "https://<apic-server-url>:443"
           APIC_USERNAME: "admin"
           APIC_PASSWORD: "password"
+
+###### Physical domain information
+       This is the physical domain created in step 2 of the APIC Configuration steps. 
+       NOTE: This is the just the physical domain name. Do NOT prefix this "uni/phys-"
+          APIC_PHYS_DOMAIN: "<phys_domain>" 
+       example:
+          APIC_PHYS_DOMAIN: "allVlans-Test"
 
 ###### Information related to leaf nodes
 Full path of the leaf nodes connected to your servers. Use the informtion obtained in Step 8 of [APIC Configuration](aci.md#apic-configuration-fabricaccess-policies) here.
