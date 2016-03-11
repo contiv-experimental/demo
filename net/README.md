@@ -3,7 +3,7 @@
 ### Pre-requisites
 1. You need Ubuntu 15 or Centos 7 on each of your servers used for the Contiv cluster
 
-2. Do "export CLUSTER_NODE_IPS=<ips of all nodes in cluster>", and export no_proxy=<ips of all nodes in cluster>,127.0.0.1,localhost,netmaster" in your shell
+2. Do export CLUSTER_NODE_IPS=<ips of all nodes in cluster>, and "export no_proxy=<ips of all nodes in cluster>,127.0.0.1,localhost,netmaster" in your shell
 
 3. If your servers are behind an http proxy (usually the case in many cisco labs...), you need
    to do "export http_proxy=<proxy url>" ,and  "export https_proxy=<proxy_url>" in your shell
