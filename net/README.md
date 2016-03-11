@@ -3,21 +3,23 @@
 ### Pre-requisites
 1. You need Ubuntu 15 or Centos 7 on each of your servers used for the Contiv cluster
 
-2. If your servers are behind an http proxy (usually the case in many cisco labs...), you need
-   to do "export http_proxy=<proxy url>" and "export https_proxy=<proxy_url>" in your shell
+2. Do "export CLUSTER_NODE_IPS=<ips of all nodes in cluster>", and export no_proxy=<ips of all nodes in cluster>,127.0.0.1,localhost,netmaster" in your shell
 
-3. You will select and use on server to initiate installation on all servers in the cluster.
+3. If your servers are behind an http proxy (usually the case in many cisco labs...), you need
+   to do "export http_proxy=<proxy url>" ,and  "export https_proxy=<proxy_url>" in your shell
+
+4. You will select and use on server to initiate installation on all servers in the cluster.
    Please refrain from running install from multiple servers. Instead, stick to the same server to initiate
    installation.
 
-4. It is recommended that you enable passwordless SSH access from the selected server to all
+5. It is recommended that you enable passwordless SSH access from the selected server to all
    the other servers in the cluster.
    An example of how to set this up is [here](http://www.linuxproblem.org/art_9.html)
 
-5. It is recommended that you enable passwordless sudo on all servers as well.
+6. It is recommended that you enable passwordless sudo on all servers as well.
    Example set up instructions can be found [here](http://askubuntu.com/questions/192050/how-to-run-sudo-command-with-no-password)
 
-6. Get the IP addresses (DNS names work as well) of all the servers and the network interface on which this IP address is configured
+7. Get the IP addresses (DNS names work as well) of all the servers and the network interface on which this IP address is configured
 
 ### Step 1: Download the installer script
 Log into one of the servers and download the installer script using the following command:
