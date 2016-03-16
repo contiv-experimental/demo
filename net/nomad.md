@@ -51,7 +51,7 @@ vagrant@netplugin-node1:sudo chmod a+w /etc/nomad.d
 
 Fill client and server configuration file for nomad client and server agents. In this demo nomad server and client agent are running on netplugin node1 and a client agent is running on netplugin node2. 
 
-client1.hcl
+**client1.hcl**
 ```
     2016/03/16 15:36:08 [INFO] consul: registering check with ID: 949af6ed65694d8a4725dcac05a541704bc5c150 for service: nomad-registered-service-f956b2b6-9c94-275c-b610-76098f7643a0
 log_level = "DEBUG"                                                                                                                                                                      2016/03/16 15:36:08 [DEBUG] consul: error registering check "949af6ed65694d8a4725dcac05a541704bc5c150": Unexpected response code: 400 (Must provide TTL or Script and Interval!)
@@ -107,7 +107,7 @@ ports {
 }
 ```
 
-server.hcl
+**server.hcl**
 ```
 # Increase log verbosity
 log_level = "DEBUG"
@@ -147,7 +147,7 @@ ports {
 
 ```
 
-client2.hcl
+**client2.hcl**
 ```
 # Increase log verbosity
 log_level = "DEBUG"
@@ -239,7 +239,7 @@ nomad init
 
 This would create an example.nomad file that we will use to deploy containers in a network. Change the docker driver config in the file to specify a network containers need to be attached to. If the network has a policy group attached to it then the format is epgname.network.
 
-example.nomad
+**example.nomad**
 ```
               # Use Docker to run the task.
                         driver = "docker"
