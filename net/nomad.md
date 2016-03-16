@@ -217,18 +217,24 @@ vagrant@netplugin-node2:nomad agent -config client2.hcl &
 ##Step 3: Verify the node status to ensure the nodes are discovered and peered.
 ```
 vagrant@netplugin-node1:/tmp$ nomad node-status -address=http://192.168.2.10:4646
-    2016/03/16 04:53:03 [DEBUG] http: Request /v1/nodes (117.577µs)
+    2016/03/16 17:51:11 [DEBUG] http: Request /v1/nodes (101.494µs)
 ID        Datacenter  Name             Class  Drain  Status
-fcca53eb  dc1         netplugin-node2  foo    false  ready
-1233ef56  dc1         netplugin-node1  foo    false  ready
+8cd0aaa1  dc1         netplugin-node2  foo    false  ready
+4bac61f9  dc1         netplugin-node1  foo    false  ready
 ```
 
-##Step 4: Create a network.
+##Step 4: Create a network and attach it to an endpoint group.
 
 If endpoint group has to be attached to a network - create policies and attach rules to the same. . Refer to the [contiv docs] on steps to create policies.  
 
 ```
-vagrant@netplugin-node1:netctl net create contiv-net -subnet="40.1.1.0/24"
+ vagrant@netplugin-node1: netctl net create contiv-net -subnet="40.1.1.0/24"
+vagrant@netplugin-node1: netctl policy create prod_web
+vagrant@netplugin-node1: netctl policy rule-add prod_web 1 -direction=in -protocol=tcp -action=deny
+vagrant@netplugin-node1: netctl policy rule-add prod_web 2 -direction=in -protocol=tcp -port=80 -action=allow -priority=10
+vagrant@netplugin-node1: netctl policy rule-add prod_web 3 -direction=in -protocol=tcp -port=443 -action=allow -priority=10
+vagrant@netplugin-node1: netctl group create contiv-net web -policy=prod_web
+
 ```
 
 ##Step 5: Now that infrastructure is setup . Create a job file and schedule tasks
@@ -237,7 +243,7 @@ vagrant@netplugin-node1:netctl net create contiv-net -subnet="40.1.1.0/24"
 nomad init
 ```
 
-This would create an example.nomad file that we will use to deploy containers in a network. Change the docker driver config in the file to specify a network containers need to be attached to. If the network has a policy group attached to it then the format is epgname.network.
+This would create an example.nomad file that we will use to deploy containers in a network. Change the docker driver config in the file to specify a network containers need to be attached to. If the network has a policy group attached to it then the format is epgname.network. If the container needs to be attached to a network without any policies set network_mode=network_name.
 
 **example.nomad**
 ```
@@ -250,7 +256,7 @@ This would create an example.nomad file that we will use to deploy containers in
                                 port_map {
                                         db = 6379
                                 }
-                                network_mode="contiv-net"
+                                network_mode="web.contiv-net"
                         }
 ```
 
@@ -261,28 +267,27 @@ vagrant@netplugin-node1:nomad run -address=http://192.168.2.10:4646 example.noma
 ##Step 6: Verify endpoints for containers are allocated ip address from the network created. 
 
 ```
-vagrant@netplugin-node2:/tmp$ docker ps
+vagrant@netplugin-node2:~$ docker ps
 CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                                                  NAMES
-9bbbabdceccd        redis:latest        "/entrypoint.sh redis"   14 seconds ago      Up 12 seconds       10.0.2.15:31919->6379/tcp, 10.0.2.15:31919->6379/udp   redis-318a32f1-aa19-d0a9-d78c-8d3fb626ef34
-vagrant@netplugin-node2:/tmp$
+5d5522b9ae0a        redis:latest        "/entrypoint.sh redis"   28 seconds ago      Up 26 seconds       10.0.2.15:58847->6379/tcp, 10.0.2.15:58847->6379/udp   redis-5d46fa82-fcc4-53cc-cf08-059417217e59
 ```
 
 ```
-vagrant@netplugin-node2:/tmp$ docker network ls
+vagrant@netplugin-node1:/tmp$ docker network ls
 NETWORK ID          NAME                DRIVER
-d83859e4a35d        contiv-net          netplugin           
-85a559f469d0        bridge              bridge              
-887eee9f9aca        none                null                
-4989cec4041e        host                host                
-f9cc9cab3ffb        docker_gwbridge     bridge 
+0c242226aa20        web.contiv-net      netplugin           
+222c44a4380b        contiv-net          netplugin           
+f28f834efacf        bridge              bridge              
+fc1f63732ca8        none                null                
+a4f246e21bb9        host                host
 ```
 
 ```
-vagrant@netplugin-node2:~$ docker network inspect d83859e4a35d
+vagrant@netplugin-node2:~$ docker network inspect web.contiv-net
 [
     {
-        "Name": "contiv-net",
-        "Id": "d83859e4a35d371ca1d09627d34a59e218494891ffe3114cfa5c3ddc24a61090",
+        "Name": "web.contiv-net",
+        "Id": "0c242226aa20bfb693d6fda89f7eb6ca3f68909b056d6178a4d9c7186c5942ed",
         "Scope": "global",
         "Driver": "netplugin",
         "IPAM": {
@@ -294,10 +299,10 @@ vagrant@netplugin-node2:~$ docker network inspect d83859e4a35d
             ]
         },
         "Containers": {
-            "9bbbabdceccd130c8bbd2691676f615c62bdfcffce81302f17847f4e36bd7e5c": {
-                "EndpointID": "cc05fb1b05f4aa85ee82fd8f69f1efb3d1625bce2d319c7272cf38976a691ba9",
+            "5d5522b9ae0a257707eecf05ff5beb6ee939a9c34b85254134ea0a3197427c1f": {
+                "EndpointID": "256aadcb73b1b96ce690d69d2fb044aef89f19b3dd8325242958fbb44b1ec4e8",
                 "MacAddress": "",
-                "IPv4Address": "40.1.1.3/24",
+                "IPv4Address": "40.1.1.4/24",
                 "IPv6Address": ""
             }
         },
@@ -310,13 +315,13 @@ vagrant@netplugin-node2:~$ docker network inspect d83859e4a35d
 ]
 ```
 ```
-vagrant@netplugin-node2:/tmp$ docker inspect 9bbbabdceccd
+vagrant@netplugin-node2:/tmp$ docker inspect 5d5522b9ae0a
 
         "Networks": {
-            "contiv-net": {
-                "EndpointID": "cc05fb1b05f4aa85ee82fd8f69f1efb3d1625bce2d319c7272cf38976a691ba9",
+            "web.contiv-net": {
+                "EndpointID": "256aadcb73b1b96ce690d69d2fb044aef89f19b3dd8325242958fbb44b1ec4e8",
                 "Gateway": "",
-                "IPAddress": "40.1.1.3",
+                "IPAddress": "40.1.1.4",
                 "IPPrefixLen": 24,
                 "IPv6Gateway": "",
                 "GlobalIPv6Address": "",
