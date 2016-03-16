@@ -4,8 +4,34 @@ The purpose of the document is to demostrate the simplicity of using Contiv as t
 
 The steps could be adapted to any vagrant or bare-metal setups running contiv components. For the simplicity of the document we assume that 2 nodes are brought with necessary contiv components (netplugin , netmaster)
 
-This could be done using [cloning] the contiv netplugin [workspace]  and [bringup] vagrant nodes
+[Clone] the contiv netplugin [workspace] and bringup vagrant nodes
 
+##Step 0:
+```
+$vagrant ssh netplugin-node1
+vagrant@netplugin-node1:/tmp$ ifconfig eth1
+eth1      Link encap:Ethernet  HWaddr 08:00:27:d5:98:b7  
+          inet addr:192.168.2.10  Bcast:0.0.0.0  Mask:255.255.255.0
+          inet6 addr: fe80::a00:27ff:fed5:98b7/64 Scope:Link
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:1066749 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:1364141 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000 
+          RX bytes:105016452 (105.0 MB)  TX bytes:141250926 (141.2 MB)
+```
+
+```
+$vagrant ssh netplugin-node2
+vagrant@netplugin-node2:~$ ifconfig eth1
+eth1      Link encap:Ethernet  HWaddr 08:00:27:1f:1a:5b  
+          inet addr:192.168.2.11  Bcast:0.0.0.0  Mask:255.255.255.0
+          inet6 addr: fe80::a00:27ff:fe1f:1a5b/64 Scope:Link
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:1360689 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:1064053 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000 
+          RX bytes:140892098 (140.8 MB)  TX bytes:104739491 (104.7 MB)
+```
 
 ##Step 1: Install nomad on all the vagrant nodes
 
@@ -199,19 +225,19 @@ fcca53eb  dc1         netplugin-node2  foo    false  ready
 
 ##Step 4: Create a network.
 
-If endpoint group has to be attached to a network - create policies and attach rules to the same. . Refer to the [docs] on steps to create policies.  
+If endpoint group has to be attached to a network - create policies and attach rules to the same. . Refer to the [contiv docs] on steps to create policies.  
 
 ```
 vagrant@netplugin-node1:netctl net create contiv-net -subnet="40.1.1.0/24"
 ```
 
-Step 5: Now that infrastructure is setup . Create a job file and schedule tasks
+##Step 5: Now that infrastructure is setup . Create a job file and schedule tasks
 
 ```
 nomad init
 ```
 
-This would create an example.nomad file that we have used to deploy containers in a network. Change the docker driver config in the file to specify a network containers need to be attached to. If the network has a policy group attached to it then the format is epgname.network.
+This would create an example.nomad file that we will use to deploy containers in a network. Change the docker driver config in the file to specify a network containers need to be attached to. If the network has a policy group attached to it then the format is epgname.network.
 
 example.nomad
 ```
@@ -232,7 +258,7 @@ example.nomad
 vagrant@netplugin-node1:nomad run -address=http://192.168.2.10:4646 example.nomad
 ```
 
-Step 6: Verify endpoints for containers are allocated ip address from the network created. 
+##Step 6: Verify endpoints for containers are allocated ip address from the network created. 
 
 ```
 vagrant@netplugin-node2:/tmp$ docker ps
@@ -305,6 +331,6 @@ vagrant@netplugin-node2:/tmp$ docker inspect 9bbbabdceccd
 
 
 [workspace]: <https://github.com/contiv/netplugin>
-[cloning]: <https://github.com/contiv/netplugin#step-1-clone-the-project-and-bringup-the-vms>
-[docs]: <http://contiv.github.io/docs/3_netplugin.html#Using Policies>
+[Clone]: <https://github.com/contiv/netplugin#step-1-clone-the-project-and-bringup-the-vms>
+[contiv docs]: <http://contiv.github.io/docs/3_netplugin.html>
 
