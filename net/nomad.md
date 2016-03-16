@@ -53,8 +53,9 @@ Fill client and server configuration file for nomad client and server agents. In
 
 **client1.hcl**
 ```
-    2016/03/16 15:36:08 [INFO] consul: registering check with ID: 949af6ed65694d8a4725dcac05a541704bc5c150 for service: nomad-registered-service-f956b2b6-9c94-275c-b610-76098f7643a0
-log_level = "DEBUG"                                                                                                                                                                      2016/03/16 15:36:08 [DEBUG] consul: error registering check "949af6ed65694d8a4725dcac05a541704bc5c150": Unexpected response code: 400 (Must provide TTL or Script and Interval!)
+# Increase log verbosity
+log_level = "DEBUG"         
+
 # Setup data dir
 data_dir = "/tmp/client1"
 
@@ -210,7 +211,6 @@ vagrant@netplugin-node1:nomad agent -config client1.hcl &
 ```
 ```
 vagrant ssh netplugin-node2
-vagrant@netplugin-node2:nomad agent -config server.hcl &
 vagrant@netplugin-node2:nomad agent -config client2.hcl &
 ```
 
