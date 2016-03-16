@@ -1,23 +1,192 @@
 #Contiv + Nomad
 
-The purpose of the document is to demostrate the simplicity of running Nomad for scheduling docker containers with Contiv as the networking and policy infrastructure for containers
+The purpose of the document is to demostrate the simplicity of using Contiv as the networking and policy infrastructure for containers with Nomad for scheduling docker containers
 
 The steps could be adapted to any vagrant or bare-metal setups running contiv components. For the simplicity of the document we assume that 2 nodes are brought with necessary contiv components (netplugin , netmaster)
 
-This could be done using pulling the contiv netplugin workspace form here
-
-make demo
-
+This could be done using [cloning] the contiv netplugin [workspace]  and [bringup] vagrant nodes
 
 
 ##Step 1: Install nomad on all the vagrant nodes
 
+```
+$ vagrant ssh netplugin-node1
+vagrant@netplugin-node1:cd /tmp/
+vagrant@netplugin-node1:curl -sSL https://releases.hashicorp.com/nomad/0.3.0/nomad_0.3.0_linux_amd64.zip -o nomad.zip
+vagrant@netplugin-node1:echo Installing Nomad...
+vagrant@netplugin-node1:unzip nomad.zip
+vagrant@netplugin-node1:sudo chmod +x nomad
+vagrant@netplugin-node1:sudo mv nomad /usr/bin/nomad
+vagrant@netplugin-node1:sudo mkdir -p /etc/nomad.d
+vagrant@netplugin-node1:sudo chmod a+w /etc/nomad.d
+```
+
+##Step 2: Create client and server Config file to run nomad agents
+
+Fill client and server configuration file for nomad client and server agents. In this demo nomad server and client agent are running on netplugin node1 and a client agent is running on netplugin node2. 
+
+client1.hcl
+```
+    2016/03/16 15:36:08 [INFO] consul: registering check with ID: 949af6ed65694d8a4725dcac05a541704bc5c150 for service: nomad-registered-service-f956b2b6-9c94-275c-b610-76098f7643a0
+log_level = "DEBUG"                                                                                                                                                                      2016/03/16 15:36:08 [DEBUG] consul: error registering check "949af6ed65694d8a4725dcac05a541704bc5c150": Unexpected response code: 400 (Must provide TTL or Script and Interval!)
+# Setup data dir
+data_dir = "/tmp/client1"
+
+enable_debug = true
+bind_addr = "192.168.2.10"
+
+addresses {
+    rpc = "192.168.2.10"
+    http = "192.168.2.10"
+    serf = "192.168.2.10"
+}
+
+advertise {
+# We need to specify our host's IP because we can't
+# advertise 0.0.0.0 to other nodes in our cluster.
+
+    rpc = "192.168.2.10:5647"
+    http = "192.168.2.10:5646"
+    serf = "192.168.2.10:5648"
+}
 
 
+# Enable the client
+client {
+    enabled = true
 
-##Step 2: Fill client and server configuration file for nomad agents. In this demo nomad server and client agent are running on netplugin node1 and a client agent is running on netplugin node2 
+    # For demo assume we are talking to server1. For production,
+    # this should be like "nomad.service.consul:4647" and a system
+    # like Consul used for service discovery.
+    servers = ["192.168.2.10:4647"]
+    node_class = "foo"
+    options {
+        "driver.raw_exec.enable" = "1"
+    }
+
+    reserved {
+       cpu = 300
+       memory = 301
+       disk = 302
+       iops = 303
+       reserved_ports = "1-3,80,81-83"
+    }
+}
+
+# Modify our port to avoid a collision with server1
+ports {
+    http = 5646
+    rpc = 5647
+    serf = 5648
+}
+```
+
+server.hcl
+```
+# Increase log verbosity
+log_level = "DEBUG"
+
+bind_addr = "192.168.2.10"
+
+addresses {
+  rpc = "192.168.2.10"
+  http = "192.168.2.10"
+  serf = "192.168.2.10"
+}
+
+advertise {
+  # We need to specify our host's IP because we can't
+  # advertise 0.0.0.0 to other nodes in our cluster.
+  rpc = "192.168.2.10:4647"
+  http = "192.168.2.10:4646"
+  serf = "192.168.2.10:4648"
+}
+
+# Setup data dir
+data_dir = "/tmp/server1"
+
+# Enable the server
+server {
+    enabled = true
+
+    # Self-elect, should be 3 or 5 for production
+    bootstrap_expect = 1
+}
+
+ports {
+    http = 4646
+    rpc = 4647
+    serf = 4648
+}
+
+```
+
+client2.hcl
+```
+# Increase log verbosity
+log_level = "DEBUG"
+
+# Setup data dir
+data_dir = "/tmp/client1"
+
+enable_debug = true
+bind_addr = "192.168.2.11"
+
+addresses {
+    rpc = "192.168.2.11"
+    http = "192.168.2.11"
+    serf = "192.168.2.11"
+}
+
+advertise {
+# We need to specify our host's IP because we can't
+# advertise 0.0.0.0 to other nodes in our cluster.
+
+    rpc = "192.168.2.11:4647"
+    http = "192.168.2.11:4646"
+    serf = "192.168.2.11:4648"
+}
 
 
+# Enable the client
+client {
+    enabled = true
+
+    # For demo assume we are talking to server1. For production,
+    # this should be like "nomad.service.consul:4647" and a system
+    # like Consul used for service discovery.
+    servers = ["192.168.2.10:4647"]
+    node_class = "foo"
+    options {
+        "driver.raw_exec.enable" = "1"
+    }
+
+    reserved {
+       cpu = 300
+       memory = 301
+       disk = 302
+       iops = 303
+       reserved_ports = "1-3,80,81-83"
+    }
+}
+
+# Modify our port to avoid a collision with server1
+ports {
+    http = 4646
+    rpc = 4647
+    serf = 4648
+}
+```
+```
+$vagrant ssh netplugin-node1
+vagrant@netplugin-node1:nomad agent -config server.hcl &
+vagrant@netplugin-node1:nomad agent -config client1.hcl &
+```
+```
+vagrant ssh netplugin-node2
+vagrant@netplugin-node2:nomad agent -config server.hcl &
+vagrant@netplugin-node2:nomad agent -config client2.hcl &
+```
 
 ##Step 3: Verify the node status to ensure the nodes are discovered and peered.
 ```
@@ -28,14 +197,114 @@ fcca53eb  dc1         netplugin-node2  foo    false  ready
 1233ef56  dc1         netplugin-node1  foo    false  ready
 ```
 
-##Step 4: Create a network and endpoint group . Attach policies and rules to the same. Skip creating endpoint group creation if the purpose of experimenting is only to verify networking functionality. More information regarding the usage of policy and network can be found at here.
+##Step 4: Create a network.
 
+If endpoint group has to be attached to a network - create policies and attach rules to the same. . Refer to the [docs] on steps to create policies.  
 
-
+```
+vagrant@netplugin-node1:netctl net create contiv-net -subnet="40.1.1.0/24"
+```
 
 Step 5: Now that infrastructure is setup . Create a job file and schedule tasks
 
+```
+nomad init
+```
+
+This would create an example.nomad file that we have used to deploy containers in a network. Change the docker driver config in the file to specify a network containers need to be attached to. If the network has a policy group attached to it then the format is epgname.network.
+
+example.nomad
+```
+              # Use Docker to run the task.
+                        driver = "docker"
+
+                        # Configure Docker driver with the image
+                        config {
+                                image = "redis:latest"
+                                port_map {
+                                        db = 6379
+                                }
+                                network_mode="contiv-net"
+                        }
+```
+
+```
+vagrant@netplugin-node1:nomad run -address=http://192.168.2.10:4646 example.nomad
+```
+
+Step 6: Verify endpoints for containers are allocated ip address from the network created. 
+
+```
+vagrant@netplugin-node2:/tmp$ docker ps
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                                                  NAMES
+9bbbabdceccd        redis:latest        "/entrypoint.sh redis"   14 seconds ago      Up 12 seconds       10.0.2.15:31919->6379/tcp, 10.0.2.15:31919->6379/udp   redis-318a32f1-aa19-d0a9-d78c-8d3fb626ef34
+vagrant@netplugin-node2:/tmp$
+```
+
+```
+vagrant@netplugin-node2:/tmp$ docker network ls
+NETWORK ID          NAME                DRIVER
+d83859e4a35d        contiv-net          netplugin           
+85a559f469d0        bridge              bridge              
+887eee9f9aca        none                null                
+4989cec4041e        host                host                
+f9cc9cab3ffb        docker_gwbridge     bridge 
+```
+
+```
+vagrant@netplugin-node2:~$ docker network inspect d83859e4a35d
+[
+    {
+        "Name": "contiv-net",
+        "Id": "d83859e4a35d371ca1d09627d34a59e218494891ffe3114cfa5c3ddc24a61090",
+        "Scope": "global",
+        "Driver": "netplugin",
+        "IPAM": {
+            "Driver": "netplugin",
+            "Config": [
+                {
+                    "Subnet": "40.1.1.0/24"
+                }
+            ]
+        },
+        "Containers": {
+            "9bbbabdceccd130c8bbd2691676f615c62bdfcffce81302f17847f4e36bd7e5c": {
+                "EndpointID": "cc05fb1b05f4aa85ee82fd8f69f1efb3d1625bce2d319c7272cf38976a691ba9",
+                "MacAddress": "",
+                "IPv4Address": "40.1.1.3/24",
+                "IPv6Address": ""
+            }
+        },
+        "Options": {
+            "encap": "vxlan",
+            "pkt-tag": "1",
+            "tenant": "default"
+        }
+    }
+]
+```
+```
+vagrant@netplugin-node2:/tmp$ docker inspect 9bbbabdceccd
+
+        "Networks": {
+            "contiv-net": {
+                "EndpointID": "cc05fb1b05f4aa85ee82fd8f69f1efb3d1625bce2d319c7272cf38976a691ba9",
+                "Gateway": "",
+                "IPAddress": "40.1.1.3",
+                "IPPrefixLen": 24,
+                "IPv6Gateway": "",
+                "GlobalIPv6Address": "",
+                "GlobalIPv6PrefixLen": 0,
+                "MacAddress": ""
+            }
+        }
+    }
+}
+]
+```
 
 
+[workspace]: <https://github.com/contiv/netplugin>
+[cloning]: <https://github.com/contiv/netplugin#step-1-clone-the-project-and-bringup-the-vms>
+[docs]: <http://contiv.github.io/docs/3_netplugin.html#Using Policies>
 
-Step 6: Verify endpoints for containers are allocated Ip's from the network created. 
