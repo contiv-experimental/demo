@@ -37,20 +37,36 @@ Apart from providing the usual information in the cfg.yml (as described [here](h
 
 ##### ACI setup Info
 All options listed below for ACI setup are mandatory.
-###### General APIC reachability information
+###### General APIC reachability information 
 
           APIC_URL: "https://<apic-server-url>:443"
           APIC_USERNAME: "admin"
           APIC_PASSWORD: "password"
 
-###### Physical domain information
+###### Physical domain information 
        This is the physical domain created in step 2 of the APIC Configuration steps. 
        NOTE: This is the just the physical domain name. Do NOT prefix this "uni/phys-"
           APIC_PHYS_DOMAIN: "<phys_domain>" 
        example:
           APIC_PHYS_DOMAIN: "allVlans-Test"
 
-###### Information related to leaf nodes
+###### Bridge domain information 
+       If the intention is not to create new bridge domains for the applications, and use one of the bridge domains already created under tenant common, this can be accomplished by specifying the bridge domain as an env parameter.
+       example:
+          APIC_EPG_BRIDGE_DOMAIN: "test"  
+       NOTE: Please make sure that this bridge domain is already created. And, also, this override works only for bridge domains in Tenant common.
+       Otherwise, specify the bridge domain as "not_specified"
+          APIC_EPG_BRIDGE_DOMAIN: "not_specified"  
+
+###### Unrestricted EPG<->EPG communication 
+       EPs within an EPG can always communicate without restrictions. But, inter-EPG communications are always dictated by contracts. But, if the intent is to allow unrestricted communication between EPGs (under a particular tenant), the following knob can be used:
+
+           APIC_CONTRACTS_UNRESTRICTED_MODE: "yes"
+       This will make sure that the EPG consumes the default "allow-all" contract.
+       Otherwise, specify this knob as "no"
+           APIC_CONTRACTS_UNRESTRICTED_MODE: "no"
+
+###### Information related to leaf nodes 
 Full path of the leaf nodes connected to your servers. Use the informtion obtained in Step 8 of [APIC Configuration](aci.md#apic-configuration-fabricaccess-policies) here.
 
         APIC_LEAF_NODES:
