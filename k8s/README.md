@@ -9,6 +9,14 @@ This is an ansible requirement.)*
 Pick a machine that is on the management network and has ansible installed
 to run the following steps.
 
+The setup scripts use python module *netaddr* and linux utility bzip2. If these are not
+installed on the machine where you are executing these steps, you must install them
+before proceeding. *(E.g. yum install bzip2; pip install netaddr)*
+
+Note on *login_userid*: Ansible requires ssh to access the nodes in the cluster for
+configuration. This requires a single userid that can log into each of the machines
+AND has sudo permission.
+
 ###Step 1 Clone this repo
 ```
 git clone https://github.com/contiv/demo
@@ -28,20 +36,20 @@ edit cluster_defs.json
 See cluster_defs.json.README for instructions
 
 ###Step 4 Prepare machines
-Create an rsa key and save in cwd as id_rsa.pub.
 
 ```
-ssh-keygen -t rsa
-
-./prepare.sh
+./prepare.sh <login_userid>
 ```
+Supply login password when prompted.
 
 ###Step 5 Create cluster
 ```
-./setup_k8s_cluster.sh
+./setup_k8s_cluster.sh <login_userid>
 ```
+Supply login password when prompted.
 
 ###Step 6 Verify cluster
 ```
-./verify_cluster.sh
+./verify_cluster.sh <login_userid>
 ```
+Supply login password when prompted.

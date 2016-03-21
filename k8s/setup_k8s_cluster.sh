@@ -60,7 +60,7 @@ username=$1
 : ${k8sVer:=v1.1.4}
 
 # contiv version
-: ${contivVer:=v0.1-02-09-2016.19-04-28.UTC}
+: ${contivVer:=v0.1-03-16-2016.13-43-59.UTC}
 
 top_dir=$PWD
 
@@ -71,4 +71,4 @@ GetContiv
 ./parse_cluster.py $username
 
 # run ansible
-ansible-playbook -i .contiv_k8s_inventory $top_dir/contrib/ansible/cluster.yml --skip-tags "contiv_restart" -e "networking=contiv localBuildOutput=$top_dir/k8s-$k8sVer/kubernetes/server/bin contiv_bin_path=$top_dir/contiv_bin etcd_peers_group=masters"
+ansible-playbook -kK -i .contiv_k8s_inventory $top_dir/contrib/ansible/cluster.yml --skip-tags "contiv_restart" -e "networking=contiv localBuildOutput=$top_dir/k8s-$k8sVer/kubernetes/server/bin contiv_bin_path=$top_dir/contiv_bin etcd_peers_group=masters"
