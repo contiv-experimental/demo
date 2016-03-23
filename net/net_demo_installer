@@ -372,10 +372,14 @@ echo ${env} > $ENV_FILE
 if $restart_mode; then
     echo "In restart mode"
     echo "Removing containers"
+    set +e
+    DOCKER_HOST=$(sudoExec docker -H unix:///var/run/docker.sock ps --no-trunc -f name=swarm-manager | grep "\--advertise=[0-9,.]*\:[0-9]*" -o | awk -F= '{print $2}')
+    docker rm -f $(docker ps -aq) > /dev/null 2>&1
     if ! [ $(docker ps -aq | wc -w) ]; then
         sudoExec docker stop $(docker ps -aq) > /dev/null 2>&1
         sudoExec docker rm $(docker ps -aq) > /dev/null 2>&1
     fi
+    set -e
     echo "Stopping all services"
     ansible-playbook $ans_opts -i $HOST_INVENTORY_FILE  -e "`cat $ENV_FILE`" $ANSIBLE_CLEANUP_FILE
 fi
@@ -395,7 +399,7 @@ fi
 # Verify if the installation is successful by checking status of installed services
 set -x
 # validate swarm container is running
-DOCKER_HOST=$(sudoExec docker -H unix:///var/run/docker.sock ps --no-trunc -f name=swarm-manager | grep "\-H \:[0-9]*" -o | awk '{print $2}')
+DOCKER_HOST=$(sudoExec docker -H unix:///var/run/docker.sock ps --no-trunc -f name=swarm-manager | grep "\--advertise=[0-9,.]*\:[0-9]*" -o | awk -F= '{print $2}')
 if [ -z "${DOCKER_HOST}" ]; then
   echo "swarm status does not look correct. Please retry install."
   exit 1
