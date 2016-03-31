@@ -2,6 +2,7 @@
 import os
 import sys
 import json
+import yaml
 
 class SafeDict(dict):
     'Provide a default value for missing keys'
@@ -35,6 +36,44 @@ def readConfig():
     cFd.close()
     return res
 
+def parseACI():
+    try:
+        aciFd = open("aci.yml")
+    except Exception:
+        return ""
+    
+    aciInfo = yaml.load(aciFd)
+    aciFd.close()
+
+    if type(aciInfo) is not dict:
+        print "Warning: aci.yml was ignored"
+        return ""
+
+    res = ""
+    for key, val in aciInfo.iteritems():
+       if type(val) is str: 
+           res += " {}={}".format(key.lower(), val)
+       elif type(val) is list: 
+           mList = ""
+           mCount = 0
+           for m in val:
+               if type(m) is str:
+                   if mCount > 0:
+                       mList += ","
+                   mList += m
+                   mCount += 1
+               else:
+                   print "aci.yml: Error parsing key {} unexepected type {} ".format(key, type(m))
+                   sys.exit(1)
+
+           res += " {}={}".format(key.lower(), mList)
+           
+       else:
+           print "aci.yml: Error parsing key {} unexepected type {} ".format(key, type(val))
+           sys.exit(1)
+
+    return res
+
 hostAttr = ["name", "management_ip", "contiv_control_if", "contiv_control_ip", "contiv_network_if", "contiv_network_ip"]
 
 if __name__ == "__main__":
@@ -43,6 +82,9 @@ if __name__ == "__main__":
         sys.exit(1)
 
     ssh_user = sys.argv[1]
+
+    # read aci info
+    aciVars = parseACI()
 
     # read cluster config
     clusterConf = readConfig()
@@ -74,7 +116,7 @@ if __name__ == "__main__":
         if mInfo['contiv_control_ip'] != mInfo['management_ip']:
             cert_ip += ",IP:" + mInfo['contiv_control_ip']
 
-        writeHostLine(outFd, mInfo, common_vars + cert_ip)
+        writeHostLine(outFd, mInfo, common_vars + cert_ip + aciVars)
 
     outFd.write("[etcd_servers]\n")
     for mInfo in clusterConf['master']:

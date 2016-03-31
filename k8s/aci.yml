@@ -1,0 +1,28 @@
+##===============================================================
+## APIC Access Info -- if you require aci integration, you should
+## edit this file as instructed below (and follow README.aci.md).
+
+## Fill in the info and uncomment (quotes are needed)
+# URL to access the apic
+#APIC_URL: "https://<apic-server-url>:443"
+
+# apic login info
+#APIC_USERNAME: "admin"
+#APIC_PASSWORD: "password"
+
+# Physical domain created in APIC for contiv. See README.aci.md for
+# for more information.
+#APIC_PHYS_DOMAIN: "physDom for contiv"
+
+# The following is for cases where BD has to be pre-defined.
+# If you don't know what this means, then you probably don't need to
+# set this.
+#APIC_EPG_BRIDGE_DOMAIN: "not_specified"
+#APIC_CONTRACTS_UNRESTRICTED_MODE: "no"
+
+## Full path of the leaf nodes connected to your servers.
+## Do not change the format. Update the pod number and node number
+## based on your aci. You can add additional nodes as necessary.
+#APIC_LEAF_NODES:
+#    - topology/pod-1/node-101
+#    - topology/pod-1/node-102
