@@ -25,9 +25,9 @@
 #APIC_URL: "https://<apic-server-url>:443"
 #APIC_USERNAME: "admin"
 #APIC_PASSWORD: "password"
-#APIC_PHYS_DOMAIN="allvlans"
-#APIC_EPG_BRIDGE_DOMAIN="not_specified"
-#APIC_CONTRACTS_UNRESTRICTED_MODE="no"
+#APIC_PHYS_DOMAIN: "allvlans"
+#APIC_EPG_BRIDGE_DOMAIN: "not_specified"
+#APIC_CONTRACTS_UNRESTRICTED_MODE: "no"
 
 ## Full path of the leaf nodes connected to your servers.
 ## List each node on a new line as shown commented
