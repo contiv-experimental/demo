@@ -25,7 +25,7 @@ INTERACTIVE_MODE=${INTERACTIVE_MODE:-"yes"}
 SAMPLE_CFG_FILE_URL="https://raw.githubusercontent.com/contiv/demo/master/net/extras/sample_cfg.yml"
 SAMPLE_ACI_CFG_FILE_URL="https://raw.githubusercontent.com/contiv/demo/master/net/extras/sample_aci_cfg.yml"
 INVENTORY_GEN_URL="https://raw.githubusercontent.com/contiv/demo/master/net/extras/genInventoryFile.py"
-ANSIBLE_SHA_VERSION=${ANSIBLE_SHA_VERSION:-"488278c901d8ea3c6fe9a716f2295100055ec13a"}
+ANSIBLE_SHA_VERSION=${ANSIBLE_SHA_VERSION:-"latest"}
 
 args=( "$@" )
 network_mode="Standalone"
@@ -374,7 +374,8 @@ if $restart_mode; then
     echo "Removing containers"
     set +e
     DOCKER_HOST=$(sudoExec docker -H unix:///var/run/docker.sock ps --no-trunc -f name=swarm-manager | grep "\--advertise=[0-9,.]*\:[0-9]*" -o | awk -F= '{print $2}')
-    docker rm -f $(docker ps -aq) > /dev/null 2>&1
+    removeList=$(docker ps -a | grep -v swarm | awk '{ print $1 }' | grep -v CONTAIN)
+    docker rm -f $removeList > /dev/null 2>&1
     if ! [ $(docker ps -aq | wc -w) ]; then
         sudoExec docker stop $(docker ps -aq) > /dev/null 2>&1
         sudoExec docker rm $(docker ps -aq) > /dev/null 2>&1
