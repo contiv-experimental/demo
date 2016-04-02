@@ -169,11 +169,11 @@ $netctl network create public --encap="vlan" --subnet=192.168.1.0/24 --gateway=1
 ```
 On Contiv1 :
 ```
-$docker run -itd --name=web --net=public ubuntu /bin/bash
+$docker run -itd --name=web1 --net=public ubuntu /bin/bash
 ```
 On Contiv2 :
 ```
-docker run -itd --name=web --net=public ubuntu /bin/bash
+docker run -itd --name=web2 --net=public ubuntu /bin/bash
 ```
 
 ##STEP 4: Login to continer and verify the ip address has been allocated from the network. 
