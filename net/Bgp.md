@@ -181,7 +181,7 @@ docker run -itd --name=web2 --net=public ubuntu /bin/bash
 ```
 $docker ps -a
 CONTAINER ID        IMAGE                          COMMAND             CREATED              STATUS              PORTS               NAMES
-084f47e72101        ubuntu                         "bash"              About a minute ago   Up About a minute                       compassionate_sammet
+084f47e72101        ubuntu                         "bash"              About a minute ago   Up About a minute                       web1
 0cc23ada5578        skynetservices/skydns:latest   "/skydns"           6 minutes ago        Up 6 minutes        53/tcp, 53/udp      defaultdns
 
 
