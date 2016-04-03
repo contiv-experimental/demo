@@ -145,6 +145,7 @@ function sudoExec() {
     sudo -E $@
 }
 
+docker_version="1.9.1"
 set -x
 # Check OS type and version
 CheckOSTypeAndVersion
@@ -161,6 +162,7 @@ fi
 if  [[ ${OS_TYPE} =~ ^CentOS ]]; then
     sudoExec yum install -y epel-release epel-testing git wget
     sudoExec yum install -y ansible
+    docker_version="1.10.3"
 fi
 
 if [ "$(which ansible)" == "" ]; then
@@ -355,6 +357,7 @@ svc_vip=$(ansible $master_node -m setup $ans_opts -i $HOST_INVENTORY_FILE | grep
 no_proxy=$(sed ':a;N;$!ba;s/\n/,/g' $HOST_IP_LOG_FILE)",127.0.0.1,localhost,netmaster"
 env=$(cat << EOF
 {
+  "docker_version":"${docker_version}",
   "env":{
     "http_proxy":"${http_proxy}",
     "HTTP_PROXY":"${http_proxy}",
