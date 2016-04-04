@@ -6,8 +6,9 @@ This document lists the steps/pre-requisites required to setup the cluster in AC
 
 Contiv currently requires a static pool of vlans that needs to be reserved for use by Contiv. Contiv manages the allocation of these vlans. The vlan range configured in APIC for contive must be ALSO set up in contiv using the *netctl global set* command. See *sample_appcli.sh*.
 
-#### APIC Configuration (Fabric/Access Policies)
+#### APIC Configuration (*Fabric/Access Policies*)
 
+```
     1. Create a VLAN Pool under "Fabric" -> "Access Policies" -> "Pools" -> "VLAN". Set allocation mode to
        "Static Allocation".
 
@@ -30,3 +31,4 @@ Contiv currently requires a static pool of vlans that needs to be reserved for u
 
    10. Use netctl global set to setup the vlan range from Step 1 in contiv.
 
+```

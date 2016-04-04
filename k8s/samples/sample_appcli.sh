@@ -55,3 +55,4 @@ netctl app-profile ls -t bevco
 #        io.contiv.tenant: bevco
 #        io.contiv.network: bevco-net1
 #        io.contiv.net-group: sodaapp
+# see samples/*.yaml for some examples
