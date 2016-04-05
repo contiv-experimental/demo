@@ -35,6 +35,8 @@ edit cluster_defs.json
 
 See cluster_defs.json.README for instructions
 
+If you need ACI integration, edit *aci.yml*. See README.aci.md for more details.
+
 ###Step 4 Prepare machines
 
 ```

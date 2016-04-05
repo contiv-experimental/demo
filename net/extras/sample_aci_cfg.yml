@@ -26,6 +26,10 @@
 #APIC_USERNAME: "admin"
 #APIC_PASSWORD: "password"
 #APIC_PHYS_DOMAIN: "allvlans"
+
+# The following two settings are for cases where BD has to be pre-defined.
+# If you don't know what this means, then you probably need to leave it
+# with the default values given below.
 #APIC_EPG_BRIDGE_DOMAIN: "not_specified"
 #APIC_CONTRACTS_UNRESTRICTED_MODE: "no"
 
