@@ -65,8 +65,8 @@ $ netctl net create contiv-net --encap=vlan --subnet=20.1.1.0/24 --gateway=20.1.
 #### Step 2: Create a port on the OVS with the network tag used for contiv-net
 ```
 $ sudo ovs-vsctl add-port contivVlanBridge inb01 -- set interface inb01 type=internal
-$ sudo ovs-vsctl set port port1 tag=1010
-$ ifconfig port1 30.1.1.8/24
+$ sudo ovs-vsctl set port inb01 tag=1010
+$ ifconfig inb01 30.1.1.8/24
 ```
 
 #### Step 3: Launch a multicast sender application
