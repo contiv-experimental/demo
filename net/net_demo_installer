@@ -162,7 +162,7 @@ fi
 
 if  [[ ${OS_TYPE} =~ ^CentOS ]]; then
     sudoExec yum install -y epel-release epel-testing git wget
-    sudoExec yum install -y ansible
+    sudoExec yum --enablerepo='epel-testing' install -y ansible
     docker_version="1.10.3"
 fi
 
