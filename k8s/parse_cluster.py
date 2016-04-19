@@ -136,8 +136,8 @@ if __name__ == "__main__":
 
     etcFd = open(".etc_hosts", "w")
     for mInfo in clusterConf['master']:
-        etcFd.write("{}    {}\n".format(mInfo['contiv_control_ip'], mInfo['name']))
+        etcFd.write("{}       {}\n".format(mInfo['contiv_control_ip'], mInfo['name']))
     for nInfo in clusterConf['nodes']:
-        etcFd.write("{}    {}\n".format(nInfo['contiv_control_ip'], nInfo['name']))
+        etcFd.write("{}       {}\n".format(nInfo['contiv_control_ip'], nInfo['name']))
 
     etcFd.close()

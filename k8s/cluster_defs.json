@@ -1,4 +1,4 @@
-{"master": [{"name": "k8master", "management_ip": "<ip_address>", "contiv_control_if": "<if-name>", "contiv_control_ip": "<ip_address>", "contiv_network_if": "<if-name>", "contiv_network_ip": "<ip_address>"}],
+{"master": [{"name": "k8master", "management_ip": "1.2.3.4", "contiv_control_if": "<if-name>", "contiv_control_ip": "<ip_address>", "contiv_network_if": "<if-name>", "contiv_network_ip": "<ip_address>"}],
  "nodes" : [{"name": "k8node-01", "management_ip": "<ip_address>", "contiv_control_if": "<if-name>", "contiv_control_ip": "<ip_address>", "contiv_network_if": "<if-name>", "contiv_network_ip": "<ip_address>", "max_pods": "40"},
             {"name": "k8node-02", "management_ip": "<ip_address>", "contiv_control_if": "<if-name>", "contiv_control_ip": "<ip_address>", "contiv_network_if": "<if-name>", "contiv_network_ip": "<ip_address>", "max_pods": "40"},
             {"name": "k8node-03", "management_ip": "<ip_address>", "contiv_control_if": "<if-name>", "contiv_control_ip": "<ip_address>", "contiv_network_if": "<if-name>", "contiv_network_ip": "<ip_address>", "max_pods": "40"}]
