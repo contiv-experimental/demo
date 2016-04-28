@@ -21,6 +21,8 @@
 
 7. Get the IP addresses (DNS names work as well) of all the servers and the network interface on which this IP address is configured
 
+8. Verify Python is installed on the target machines 
+
 ### Step 1: Download the installer script
 Log into one of the servers and download the installer script using the following command:
 - `wget https://raw.githubusercontent.com/contiv/demo/master/net/net_demo_installer`
