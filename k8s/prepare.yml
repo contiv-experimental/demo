@@ -21,8 +21,7 @@
     hostname: name="{{ name }}"
 
   - name: Setup | clean up /etc/hosts
-    lineinfile: dest=/etc/hosts line="{{ item }}" state=absent
-    with_items: "{{ etc_host_entries }}"
+    lineinfile: dest=/etc/hosts regexp='.*       ' state=absent
     tags:
       - etc_hosts
 
@@ -31,6 +30,11 @@
     with_items: "{{ etc_host_entries }}"
     tags:
       - etc_hosts
+
+  - name: Setup | install net-tools
+    yum: name=net-tools state=installed
+    tags:
+      - if_cfg
 
   - name: Setup | configure control_ip
     shell: ifconfig "{{ contiv_control_if }}" "{{ contiv_control_ip }}"/24
@@ -92,13 +96,17 @@
     tags:
       - etcd_uninstall
     
-  - name: Remove /var/lib/etcd/
-    file: path=/var/lib/etcd state=absent
+  - name: Remove /var/lib/etcd/ and etcd.service
+    file: path={{ item }} state=absent
+    with_items:
+      - /etc/systemd/system/etcd.service
+      - /var/lib/etcd
     tags:
       - etcd_uninstall
 
   - name: Verify | ping control n/w
-    shell: ping "{{ hostvars['k8master']['name'] }}" -c 3 -W 1
+    shell: ping "{{ hostvars[item]['name'] }}" -c 3 -W 1
+    with_items: "{{ groups['masters'] }}"
     tags:
       - verify
 
