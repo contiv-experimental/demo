@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: iperf-fzzo
+spec:
+  ports:
+  - port: 8888 # the port that this service should serve on
+    # the container on each pod to connect to, can be a name
+    targetPort: 5001
+    protocol: TCP
+
+    # selects the pods that are provders of the service
+  selector:
+    app: fzzo
