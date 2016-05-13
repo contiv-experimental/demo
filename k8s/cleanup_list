@@ -1,0 +1,6 @@
+[cleanme]
+hostname ansible_ssh_host=a.b.c.d
+
+#e.g.
+#ip-172-18-10-194 ansible_ssh_host=24.172.213.65
+#ip-172-18-10-192 ansible_ssh_host=24.172.213.66
