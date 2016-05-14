@@ -43,9 +43,21 @@
      - kubelet
      - docker
      - netplugin
-     - openvswitch
     tags:
       - stop_contiv
+
+  - name: Admin | clean up ovs state
+    shell: ovs-vsctl del-br {{ item }}
+    with_items:
+     - contivVxlanBridge
+     - contivVlanBridge
+    tags:
+      - erase_state
+
+  - name: Admin | clean up ports
+    shell: for p in `ifconfig  | grep vport | awk '{print $1}'`; do sudo ip link delete $p type veth; done
+    tags:
+      - erase_state
 
   - name: Admin | copy netplugin exec files
     copy: src={{ contiv_bin_path }}/netplugin dest=/usr/bin/netplugin mode=0755
@@ -120,6 +132,7 @@
 
 - hosts: nodes
   sudo: yes
+  serial: 2
 
   tasks:
 
