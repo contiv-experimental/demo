@@ -1,0 +1,162 @@
+---
+# This playbook allows services to be turned on/off
+
+- hosts: masters
+  sudo: yes
+
+  tasks:
+
+  - name: Admin | stop kube master services
+    service: name="{{ item }}" state=stopped
+    with_items:
+     - kube-scheduler
+     - kube-apiserver
+     - kube-controller-manager
+     - netmaster
+     - aci-gw
+     - etcd
+    tags:
+      - stop_all
+
+- hosts: nodes
+  sudo: yes
+
+  tasks:
+
+  - name: Admin | stop node services
+    service: name="{{ item }}" state=stopped
+    with_items:
+     - kubelet
+     - netplugin
+     - docker
+     - etcd
+    tags:
+      - stop_all
+
+- hosts: nodes
+  sudo: yes
+
+  tasks:
+  - name: Admin | Stop netplugin, kubelet and docker
+    service: name="{{ item }}" state=stopped
+    with_items:
+     - kubelet
+     - docker
+     - netplugin
+    tags:
+      - stop_contiv
+
+  - name: Admin | clean up ovs state
+    shell: ovs-vsctl del-br {{ item }}
+    with_items:
+     - contivVxlanBridge
+     - contivVlanBridge
+    tags:
+      - erase_state
+
+  - name: Admin | clean up ports
+    shell: for p in `ifconfig  | grep vport | awk '{print $1}'`; do sudo ip link delete $p type veth; done
+    tags:
+      - erase_state
+
+  - name: Admin | copy netplugin exec files
+    copy: src={{ contiv_bin_path }}/netplugin dest=/usr/bin/netplugin mode=0755
+    tags:
+      - upgrade
+
+  - name: Admin | copy cni exec files
+    copy: src={{ contiv_bin_path }}/contivk8s dest=/opt/cni/bin/contivk8s.bin mode=0755
+    tags:
+      - upgrade
+
+- hosts: masters
+  sudo: yes
+
+  tasks:
+  - name: Admin | Stop netmaster
+    service: name="{{ item }}" state=stopped
+    with_items:
+     - netmaster
+     - aci-gw
+    tags:
+      - stop_contiv
+
+  - name: Admin | Clean up contiv state
+    shell: etcdctl rm --recursive /contiv.io
+    tags:
+      - erase_state
+
+  - name: Admin | copy netmaster exec files
+    copy: src={{ contiv_bin_path }}/{{ item}} dest=/usr/bin/{{ item }} mode=0755
+    with_items:
+      - netmaster
+      - netctl
+    tags:
+      - upgrade
+
+  - name: Admin | Start netmaster
+    service: name="{{ item }}" state=started
+    with_items:
+     - ntpd
+     - netmaster
+     - aci-gw
+    tags:
+      - start_netmaster
+
+  - name: Admin | Configure netmaster
+    action: shell netctl net create default-net --subnet=20.1.1.0/24 --gateway=20.1.1.254
+    register: config_result
+    until: config_result.rc == 0
+    retries: 9
+    delay: 10
+    tags:
+      - config_netmaster
+
+- hosts: masters
+  sudo: yes
+
+  tasks:
+
+  - name: Admin | start kube master services
+    service: name="{{ item }}" state=started
+    with_items:
+     - ntpd
+     - etcd
+     - netmaster
+     - aci-gw
+     - kube-scheduler
+     - kube-apiserver
+     - kube-controller-manager
+    tags:
+      - start_all
+
+- hosts: nodes
+  sudo: yes
+  serial: 2
+
+  tasks:
+
+  - name: Admin | Start openvswitch
+    service: name=openvswitch state=started
+    tags:
+      - start_all
+
+  - name: Admin | Setup ovs
+    shell: "ovs-vsctl set-manager {{ item }}"
+    with_items:
+      - "tcp:127.0.0.1:6640"
+      - "ptcp:6640"
+    tags:
+      - start_all
+
+  - name: Admin | start node services
+    service: name="{{ item }}" state=started
+    with_items:
+     - ntpd
+     - etcd
+     - netplugin
+     - docker
+     - kubelet
+    tags:
+      - start_all
+
