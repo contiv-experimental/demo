@@ -7,8 +7,9 @@
   tasks:
 
   - name: Verify | ping control n/w
-    shell: ping "{{ hostvars['k8master']['name'] }}" -c 3 -W 1
-
+    shell: ping "{{ hostvars[item]['name'] }}" -c 3 -W 1
+    with_items: "{{ groups['masters'] }}"
+ 
   - name: Verify | contiv etcd 
     shell: etcdctl ls /contiv.io
 
