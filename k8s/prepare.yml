@@ -20,6 +20,11 @@
   - name: Setup | hostname
     hostname: name="{{ name }}"
 
+  - name: Setup | clean up /etc/hosts netmaster entry
+    lineinfile: dest=/etc/hosts regexp=.*netmaster$ state=absent
+    tags:
+      - etc_hosts
+
   - name: Setup | clean up /etc/hosts
     lineinfile: dest=/etc/hosts regexp='.*       ' state=absent
     tags:
