@@ -41,6 +41,11 @@
     tags:
       - if_cfg
 
+  - name: Setup | configure control_ip
+    shell: ifconfig "{{ contiv_control_if }}" "{{ contiv_control_ip }}"/24
+    tags:
+      - if_cfg
+
   - name: Setup | Make control_if up
     shell: ifconfig "{{ contiv_control_if }}" up
     tags:
