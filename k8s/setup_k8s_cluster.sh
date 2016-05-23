@@ -60,7 +60,10 @@ username=$1
 : ${k8sVer:=v1.1.4}
 
 # contiv version
-: ${contivVer:=v0.1-03-16-2016.13-43-59.UTC}
+: ${contivVer:=v0.1-05-02-2016.23-10-27.UTC}
+
+# contiv fwd mode - bridge or routing
+: ${contivFwdMode:=bridge}
 
 top_dir=$PWD
 
@@ -71,4 +74,4 @@ GetContiv
 ./parse_cluster.py $username
 
 # run ansible
-ansible-playbook -kK -i .contiv_k8s_inventory $top_dir/contrib/ansible/cluster.yml --skip-tags "contiv_restart,addons" -e "networking=contiv localBuildOutput=$top_dir/k8s-$k8sVer/kubernetes/server/bin contiv_bin_path=$top_dir/contiv_bin etcd_peers_group=masters"
+ansible-playbook -kK -i .contiv_k8s_inventory $top_dir/contrib/ansible/cluster.yml --skip-tags "contiv_restart,addons" -e "networking=contiv contiv_fwd_mode=$contivFwdMode localBuildOutput=$top_dir/k8s-$k8sVer/kubernetes/server/bin contiv_bin_path=$top_dir/contiv_bin etcd_peers_group=masters"
