@@ -145,8 +145,8 @@ function sudoExec() {
     sudo -E $@
 }
 
-contiv_network_version="v0.1-03-16-2016.13-43-59.UTC"
-docker_version="1.9.1"
+contiv_network_version="v0.1-05-19-2016.08-34-56.UTC"
+docker_version="1.11.1"
 set -x
 # Check OS type and version
 CheckOSTypeAndVersion

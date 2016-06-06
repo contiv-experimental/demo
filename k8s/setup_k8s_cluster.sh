@@ -60,7 +60,7 @@ username=$1
 : ${k8sVer:=v1.1.4}
 
 # contiv version
-: ${contivVer:=v0.1-05-02-2016.23-10-27.UTC}
+: ${contivVer:=v0.1-05-19-2016.08-34-56.UTC}
 
 # contiv fwd mode - bridge or routing
 : ${contivFwdMode:=bridge}
