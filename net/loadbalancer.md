@@ -7,7 +7,7 @@ A provider can be one or many containers that match the label selector associate
 
 ##How is a Service defined
 
-Current implementation allows services to be defined using netctl. Services need to be created in a service network. So we create a service subnet and attach  the service to the service network
+Current implementation allows services to be defined using netctl. Services need to be created in a service network. So we create a service network and attach  the service to the service network
 ```
 netctl net create cisco-srv-net -s 100.1.1.0/24
 
@@ -32,12 +32,44 @@ ef6691ebb26ea54749242606ec23be01903f886f58382e346ec61369aab39073
 docker run -itd --net=cisco-net --label=app=myapp alpine sh
 2a3ac3917e54775081e2afc40ce6d718e7871d4814a6fd387ecf4eca16fc2474
 
-docker exec -it 
-
-
 ```
 
 ##Demonstration of reachability to a service from the client containers
+
+Start listeners on each of the providers.
+
+```
+docker exec -it 2c30b978c87bad64ced1f8158b72d17abf7748889464023d4e23a4bd24ae2d28 sh
+#nc -l -p 80 &
+
+docker exec -it 3a23aa2d5891153999871544362b881fcd461e46021007453e0e6e7edf06b348 sh
+#nc -l -p 80 &
+
+docker exec -it ef6691ebb26ea54749242606ec23be01903f886f58382e346ec61369aab39073 sh
+#nc -l -p 80 &
+
+docker exec -it 2a3ac3917e54775081e2afc40ce6d718e7871d4814a6fd387ecf4eca16fc2474 sh
+#nc -l -p 80 &
+```
+
+Create a network for clients/consumers and start containers. Try to reach the service ip(service ip allocated in our example is 100.1.1.3) on the service port
+
+```
+netctl net create client-net -s 11.1.1.0/24 -g 11.1.1.254
+
+docker run -itd --net=client-net  alpine sh
+9e6842a59369ba67d6224c1502ab0e68360fe7aaa0949a04462a9ae0bdbc6830
+
+docker exec -it 9e6842a59369ba67d6224c1502ab0e68360fe7aaa0949a04462a9ae0bdbc6830 sh
+# nc -znvw 1 100.1.1.3 8080
+100.1.1.3 (100.1.1.3:8080) open
+```
+
+Note: Service IP can also be a preferred ip address. This can be enforce while creating the service configuration with -ip option.
+Coming Soon: Watch for more intuitive contiv-compose integration. 
+
+
+
 
 
 
