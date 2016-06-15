@@ -18,7 +18,7 @@ netctl service create app-svc --network contiv-srv-net --tenant default --select
 
 Providers can be associated with a service by starting with matching labels. In the following example we create a network contiv-net which will be used by the 4 providers created with labels matching the service selector. Start listeners on each of the providers.
 ```
-netctl net create contiv-net -s 10.1.1.0/24
+netctl net create contiv-net -s 10.1.1.0/24 -g 10.1.1.254
 
 docker run -itd --net=contiv-net --label=tier=web --label=release=stable --label=environment=prod --label=version=1.0 alpine sh
 2c30b978c87bad64ced1f8158b72d17abf7748889464023d4e23a4bd24ae2d28
