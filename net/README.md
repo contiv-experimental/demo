@@ -53,6 +53,11 @@ For every server in the setup, provide the IP/DNS and the control, data interfac
 ### Step 3: Provide executable privileges and run installer script
 - `chmod +x net_demo_installer`
 
+set the environment variable contiv_network_version if a different version of Contiv network is needed.
+export contiv_network_version=$"v0.1-06-17-2016.08-42-14.UTC"
+
+contiv network version can be obtained from: https://github.com/contiv/netplugin/releases 
+
 Run net_demo_installer script. 
 
             ./net_demo_installer
