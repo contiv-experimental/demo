@@ -46,8 +46,8 @@ Supply login password when prompted.
 
 ###Step 5 Create cluster
 ```
-set CONTIVNETVERSION
-example:- export CONTIVNETVERSION=$"v0.1-06-17-2016.08-42-14.UTC"
+set contivVer if you want to use a specific contiv network version.
+example:- export contivVer=$"v0.1-06-17-2016.08-42-14.UTC"
 
 contiv network version can be obtained from: https://github.com/contiv/netplugin/releases
 
