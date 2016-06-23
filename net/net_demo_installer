@@ -61,7 +61,7 @@ function ConfirmPrompt {
           echo "interactive mode was turned off, assuming not to proceed"
           exit 1
       else
-          echo "interactive mode was turned off, assuming ok to proceed"
+          echo "interactive mode was turned on, assuming ok to proceed"
           return
       fi
   fi
@@ -145,8 +145,12 @@ function sudoExec() {
     sudo -E $@
 }
 
-contiv_network_version="v0.1-05-19-2016.08-34-56.UTC"
+: ${contiv_network_version:=v0.1-05-19-2016.08-34-56.UTC}
+echo "Using version: $contiv_network_version"
+
 docker_version="1.11.1"
+
+#docker_version="1.11.1"
 set -x
 # Check OS type and version
 CheckOSTypeAndVersion
@@ -199,7 +203,7 @@ while getopts "carhl" opt; do
   l)
       fwd_mode="routing"
       ShiftArgs
-      ;; 
+      ;;
 	?)
 	    echo "Invalid option: -$OPTARG" >&2
             echo "$USAGE"
@@ -260,7 +264,7 @@ set -xe
 # Check and pull ansible repository
 if [ -d "ansible" ]; then
     cd ansible
-    git pull --rebase origin 
+    git pull --rebase origin
     cd ..
 else
     git clone https://github.com/contiv/ansible.git
