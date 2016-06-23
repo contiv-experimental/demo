@@ -46,6 +46,11 @@ Supply login password when prompted.
 
 ###Step 5 Create cluster
 ```
+set CONTIVNETVERSION
+example:- export CONTIVNETVERSION=$"v0.1-06-17-2016.08-42-14.UTC"
+
+contiv network version can be obtained from: https://github.com/contiv/netplugin/releases
+
 ./setup_k8s_cluster.sh <login_userid>
 ```
 Supply login password when prompted.
