@@ -11,7 +11,7 @@ function GetKubernetes {
     rm -rf $top_dir/k8s-$k8sVer/kubernetes
     rm -rf $top_dir/k8s-$k8sVer/bin
   else
-    cd $top_dir/k8s-$k8sVer 
+    cd $top_dir/k8s-$k8sVer
     wget https://github.com/kubernetes/kubernetes/releases/download/$k8sVer/kubernetes.tar.gz
   fi
 
@@ -61,6 +61,7 @@ username=$1
 
 # contiv version
 : ${contivVer:=v0.1-05-19-2016.08-34-56.UTC}
+echo "Using version: $contivVer"
 
 # contiv fwd mode - bridge or routing
 : ${contivFwdMode:=bridge}
