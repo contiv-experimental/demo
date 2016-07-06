@@ -58,6 +58,18 @@ export contiv_network_version="v0.1-06-17-2016.08-42-14.UTC"
 
 contiv network version can be obtained from: https://github.com/contiv/netplugin/releases 
 
+You can also specify custom aci-gw container if you want.
+
+Just do export aci_gw_version=your container name:tag. Default is set to "contiv/aci-gw"
+
+for example:
+
+```
+export aci_gw_version="contiv/aci-gw:latest"
+```
+
+Will fetch container aci-gw of contiv user from docker hub registry with latest tag.
+
 Run net_demo_installer script. 
 
             ./net_demo_installer
