@@ -149,7 +149,6 @@ function sudoExec() {
 echo "Using version: $contiv_network_version"
 
 docker_version="1.11.1"
-aci_gw_version="contiv/aci-gw:latest"
 
 set -x
 # Check OS type and version
