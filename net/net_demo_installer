@@ -362,6 +362,7 @@ no_proxy=$(sed ':a;N;$!ba;s/\n/,/g' $HOST_IP_LOG_FILE)",127.0.0.1,localhost,netm
 env=$(cat << EOF
 {
   "docker_version":"${docker_version}",
+  "aci_gw_image":"${aci_gw_image}",
   "aci_gw_version":"${aci_gw_version}",
   "contiv_network_version":"${contiv_network_version}",
   "env":{
