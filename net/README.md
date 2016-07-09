@@ -54,9 +54,23 @@ For every server in the setup, provide the IP/DNS and the control, data interfac
 - `chmod +x net_demo_installer`
 
 set the environment variable contiv_network_version if a different version of Contiv network is needed.
+```
 export contiv_network_version="v0.1-06-17-2016.08-42-14.UTC"
+```
 
 contiv network version can be obtained from: https://github.com/contiv/netplugin/releases 
+
+You can also specify custom aci-gw container if you want.
+
+Just do export aci_gw_image=your container name. Default is set to "contiv/aci-gw"
+
+for example:
+
+```
+export aci_gw_image="contiv/aci-gw:latest"
+```
+
+Will fetch container aci-gw of contiv user from docker hub registry with latest tag.
 
 Run net_demo_installer script. 
 
