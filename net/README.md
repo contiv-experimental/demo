@@ -60,14 +60,13 @@ export contiv_network_version="v0.1-06-17-2016.08-42-14.UTC"
 
 contiv network version can be obtained from: https://github.com/contiv/netplugin/releases 
 
-You can also specify custom aci-gw container if you want.
+"aci_gw_image" specifies the docker image used for the aci-gw. This defaults to "contiv/aci-gw:latest". 
 
-Just do export aci_gw_image=your container name. Default is set to "contiv/aci-gw"
-
-for example:
+If your setup requires a different image, just set this "aci_gw_image" environment variable to the "image-name:version".
+e.g.
 
 ```
-export aci_gw_image="contiv/aci-gw:latest"
+export aci_gw_image="contiv/aci-gw:v2"
 ```
 
 Will fetch container aci-gw of contiv user from docker hub registry with latest tag.
