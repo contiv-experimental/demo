@@ -63,13 +63,14 @@ contiv network version can be obtained from: https://github.com/contiv/netplugin
 "aci_gw_image" specifies the docker image used for the aci-gw. This defaults to "contiv/aci-gw:latest". 
 
 If your setup requires a different image, just set this "aci_gw_image" environment variable to the "image-name:version".
+
 e.g.
 
 ```
 export aci_gw_image="contiv/aci-gw:v2"
 ```
 
-Will fetch container aci-gw of contiv user from docker hub registry with latest tag.
+Will fetch container aci-gw of contiv user from docker hub registry with v2 tag.
 
 Run net_demo_installer script. 
 
