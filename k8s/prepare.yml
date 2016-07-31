@@ -36,6 +36,9 @@
     tags:
       - etc_hosts
 
+  - name: Setup | Verify access to public repos
+    shell: ping github.com -c 3 -W 1
+
   - name: Setup | install net-tools
     yum: name=net-tools state=installed
     tags:
@@ -48,11 +51,6 @@
 
   - name: Setup | Make control_if up
     shell: ifconfig "{{ contiv_control_if }}" up
-    tags:
-      - if_cfg
-
-  - name: Setup | configure data_ip
-    shell: ifconfig "{{ contiv_network_if }}" "{{ contiv_network_ip }}"/24
     tags:
       - if_cfg
 
@@ -73,6 +71,7 @@
 
   - name: Docker Storage | stop docker
     service: name=docker state=stopped
+    ignore_errors: yes
     tags:
       - docker_mnt_fix
 
@@ -93,6 +92,7 @@
 
   - name: stop etcd
     service: name=etcd state=stopped
+    ignore_errors: yes
     tags:
       - etcd_uninstall
     
@@ -127,8 +127,26 @@
      - kube-scheduler
      - kube-apiserver
      - kube-kube-controller-manager
+     - httpd
+    ignore_errors: yes
     tags:
       - stop
+
+  - name: Remove certificates
+    file: path=/etc/kubernetes/certs/{{ item }} state=absent
+    with_items:
+     - ca.crt
+     - kubecfg.crt
+     - kubecfg.key
+     - kubelet.crt
+     - kubelet.key
+     - server.crt
+     - server.key
+
+
+  - name: yum update
+    shell: yum update -y
+    ignore_errors: yes
 
 - hosts: nodes
   sudo: yes
@@ -140,5 +158,18 @@
     with_items:
      - kubelet
      - docker
+     - httpd
+    ignore_errors: yes
     tags:
       - stop
+
+  - name: Remove certificates
+    file: path=/etc/kubernetes/certs/{{ item }} state=absent
+    with_items:
+     - ca.crt
+     - kubecfg.crt
+     - kubecfg.key
+
+  - name: yum update
+    shell: yum update -y
+    ignore_errors: yes
