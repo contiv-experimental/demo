@@ -37,7 +37,7 @@
       - etc_hosts
 
   - name: Setup | Verify access to public repos
-    shell: ping github.com -c 3 -W 1
+    shell: curl github.com
 
   - name: Setup | install net-tools
     yum: name=net-tools state=installed
