@@ -12,4 +12,4 @@ username=$1
 top_dir=$PWD
 
 # run ansible
-ansible-playbook -kK -i cleanup_list $top_dir/cleanup.yml -e "ssh_username=$username"
+ansible-playbook -kK -i cleanup_list $top_dir/cleanup.yml -e "ansible_ssh_user=$username"
