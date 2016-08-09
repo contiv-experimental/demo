@@ -80,3 +80,4 @@
     shell: journalctl --since="{{ np_start_time.stdout }}" -u netplugin | grep error
     register: np_errors
     failed_when: np_errors.rc == 0
+    ignore_errors: yes
