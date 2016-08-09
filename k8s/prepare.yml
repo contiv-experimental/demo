@@ -159,6 +159,7 @@
      - kubelet
      - docker
      - httpd
+     - kube-proxy
     ignore_errors: yes
     tags:
       - stop
