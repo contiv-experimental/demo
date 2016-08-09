@@ -9,10 +9,31 @@
 
   tasks:
 
+  - name: Cleanup | clean up ovs state
+    shell: ovs-vsctl del-br {{ item }}
+    with_items:
+     - contivVxlanBridge
+     - contivVlanBridge
+     - contivHostBridge
+    ignore_errors: yes
+    tags:
+      - erase_state
+
+  - name: Cleanup | clean up ports
+    shell: for p in `ifconfig  | grep {{ item }} | awk '{print $1}'`; do sudo ip link delete $p type veth; done
+    with_items:
+     - vport
+     - hport
+     - contivh0
+    ignore_errors: yes
+    tags:
+      - erase_state
+
   - name: Cleanup | stop services started for k8s-contiv
     service: name="{{ item }}" state=stopped
     with_items:
      - kubelet
+     - kube-proxy
      - docker
      - netmaster
      - aci-gw

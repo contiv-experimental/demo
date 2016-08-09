@@ -57,6 +57,9 @@
 
   tasks:
 
+  - name: Verify | docker status
+    shell: service docker status | grep running
+
   - name: Verify | netplugin status
     shell: service netplugin status | grep running
 

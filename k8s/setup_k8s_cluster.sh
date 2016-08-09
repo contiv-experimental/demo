@@ -60,7 +60,7 @@ username=$1
 : ${k8sVer:=v1.3.0}
 
 # contiv version
-: ${contivVer:=v0.1-07-14-2016.07-06-17.UTC}
+: ${contivVer:=v0.1-08-06-2016.07-13-09.UTC}
 echo "Using version: $contivVer"
 
 # contiv fwd mode - bridge or routing

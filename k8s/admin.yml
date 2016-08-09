@@ -51,11 +51,18 @@
     with_items:
      - contivVxlanBridge
      - contivVlanBridge
+     - contivHostBridge
+    ignore_errors: yes
     tags:
       - erase_state
 
   - name: Admin | clean up ports
-    shell: for p in `ifconfig  | grep vport | awk '{print $1}'`; do sudo ip link delete $p type veth; done
+    shell: for p in `ifconfig  | grep {{ item }} | awk '{print $1}'`; do sudo ip link delete $p type veth; done
+    with_items:
+     - vport
+     - hport
+     - contivh0
+    ignore_errors: yes
     tags:
       - erase_state
 
@@ -104,7 +111,7 @@
       - start_netmaster
 
   - name: Admin | Configure netmaster
-    action: shell netctl net create default-net --subnet=20.1.1.0/24 --gateway=20.1.1.254
+    action: shell netctl net create default-net --subnet=20.1.1.0/24 
     register: config_result
     until: config_result.rc == 0
     retries: 9
