@@ -111,6 +111,15 @@
       - start_netmaster
 
   - name: Admin | Configure netmaster
+    action: shell netctl global set --fwd-mode {{ contiv_fwd_mode }}
+    register: config_result
+    until: config_result.rc == 0
+    retries: 9
+    delay: 10
+    tags:
+      - config_netmaster
+
+  - name: Admin | Configure netmaster
     action: shell netctl net create default-net --subnet=20.1.1.0/24 
     register: config_result
     until: config_result.rc == 0
