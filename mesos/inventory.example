@@ -1,0 +1,18 @@
+#netplugin master nodes, runs mesos-master, marathon, etcd & zookeeper 
+[master]
+192.168.2.10 netplugin_ctrl_interface=eth1 netplugin_vlan_interface=eth2  mesos_install_mode="master"
+192.168.2.11 netplugin_ctrl_interface=eth1 netplugin_vlan_interface=eth2  mesos_install_mode="master-slave"
+192.168.2.12 netplugin_ctrl_interface=eth1 netplugin_vlan_interface=eth2  mesos_install_mode="master-slave"
+
+# netplugin non-master nodes, 
+[nodes]
+192.168.2.13 netplugin_ctrl_interface=eth1 netplugin_vlan_interface=eth2  mesos_install_mode="slave"
+192.168.2.14 netplugin_ctrl_interface=eth1 netplugin_vlan_interface=eth2  mesos_install_mode="slave"
+
+# cluster name ito use in etcd and mesos
+[all:vars]
+cluster_name="cluster001"
+
+# proxy configuration
+proxy_env={ 'http_proxy':'', 'https_proxy':'' }
+    
