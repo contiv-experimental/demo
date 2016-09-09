@@ -41,6 +41,13 @@
 
   - name: Setup | install net-tools
     yum: name=net-tools state=installed
+    when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+    tags:
+      - if_cfg
+
+  - name: Setup | install net-tools
+    apt: name=net-tools state=installed
+    when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
     tags:
       - if_cfg
 
@@ -66,6 +73,7 @@
 
   - name: Setup | Disable firewalld
     service: name=firewalld state=stopped
+    ignore_errors: yes
     tags:
       - stop_fw
 
@@ -98,6 +106,13 @@
     
   - name: Unistall etcd
     yum: name=etcd state=removed
+    when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+    tags:
+      - etcd_uninstall
+    
+  - name: Unistall etcd
+    apt: name=etcd state=removed
+    when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
     tags:
       - etcd_uninstall
     
@@ -147,6 +162,7 @@
   - name: yum update
     shell: yum update -y
     ignore_errors: yes
+    when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
 
 - hosts: nodes
   sudo: yes
@@ -173,4 +189,5 @@
 
   - name: yum update
     shell: yum update -y
+    when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
     ignore_errors: yes

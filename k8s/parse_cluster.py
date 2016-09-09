@@ -22,7 +22,8 @@ def writeHostLine(outFd, hC, comVars):
     mgmnt_ip = hConfig['management_ip']
     outFd.write("{} ansible_ssh_host={}".format(host, mgmnt_ip))
     for attr in hostAttr:
-        outFd.write(" {}={}".format(attr, hConfig[attr]))
+        if hConfig[attr] != "":
+            outFd.write(" {}={}".format(attr, hConfig[attr]))
 
     if hConfig['max_pods'] is not 'missing':
         outFd.write(" {}=\"{}\"".format('max_pods', hConfig['max_pods']))
@@ -118,15 +119,18 @@ if __name__ == "__main__":
 
         writeHostLine(outFd, mInfo, common_vars + cert_ip + aciVars)
 
+    etcdServers = set()
     outFd.write("[etcd_servers]\n")
     for mInfo in clusterConf['master']:
         writeHostLine(outFd, mInfo, common_vars)
+        etcdServers.add(mInfo['name'])
 
     outFd.write("[etcd]\n")
     for mInfo in clusterConf['master']:
         writeHostLine(outFd, mInfo, common_vars + " etcd_proxy_mode=off")
     for nInfo in clusterConf['nodes']:
-        writeHostLine(outFd, nInfo, common_vars + " etcd_proxy_mode=on")
+        if nInfo['name'] not in etcdServers:
+            writeHostLine(outFd, nInfo, common_vars + " etcd_proxy_mode=on")
 
     outFd.write("[nodes]\n")
     for nInfo in clusterConf['nodes']:
