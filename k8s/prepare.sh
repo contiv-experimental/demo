@@ -13,4 +13,5 @@ top_dir=$PWD
 ./parse_cluster.py $username
 
 # run ansible
+# you might need to add ansible_python_interpreter=/usr/bin/python2.7 to the -e list for ubuntu
 ansible-playbook -kK -i .contiv_k8s_inventory $top_dir/prepare.yml --skip-tags "docker_mnt_fix,ssh_key" -e "ssh_username=$username"

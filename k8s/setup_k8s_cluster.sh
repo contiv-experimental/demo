@@ -75,4 +75,6 @@ GetContiv
 ./parse_cluster.py $username
 
 # run ansible
+# if you need to specify ansible_python_interpreter (e.g. for ubuntu), you can add 
+# ansible_python_interpreter=/usr/bin/python2.7 to the -e list
 ansible-playbook -kK -i .contiv_k8s_inventory $top_dir/contrib/ansible/cluster.yml --skip-tags "contiv_restart" -e "networking=contiv contiv_fwd_mode=$contivFwdMode localBuildOutput=$top_dir/k8s-$k8sVer/kubernetes/server/bin contiv_bin_path=$top_dir/contiv_bin etcd_peers_group=masters"

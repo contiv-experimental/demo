@@ -16,7 +16,7 @@ Fields
 
 "contiv_control_ip": This is the ip address of the interface used for control communication. During the prepare step, this address will be assigned to the interface. If you are using the management interface for control as well, you should provide management ip here(you cannot use the DNS name for this field).
 
-"contiv_network_if": This is the interface name (as seen on ifconfig) that should be used for tenant traffic. This interface MUST be dedicated. It CANNOT be shared with control or management.
+"contiv_network_if": This is the interface name (as seen on ifconfig) that should be used for tenant traffic. This interface MUST be dedicated. It CANNOT be shared with control or management. *If you're using ONLY vxlan, you have the option of not specifying this field. In that case, please set this to "".*
 
 "contiv_network_ip": This is the ip address of the interface used for tenant traffic. You can assign any private IP address here.
 
