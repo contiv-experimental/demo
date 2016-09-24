@@ -1,0 +1,131 @@
+- hosts: all
+  become: true
+  tasks:
+   - name : update /etc/hosts
+     lineinfile: dest=/etc/hosts line="{{ hostvars[item]['ansible_' + netplugin_ctrl_interface]['ipv4']['address'] }} {{hostvars[item]['ansible_hostname'] }} " state=present
+     with_items: groups['all']
+  environment: "{{ proxy_env }}"
+
+- hosts: all
+  become: true
+  roles:
+    - role: .ansible_iptables
+  vars:
+     iptables_allowed_tcp_ports: [ 22, 9001, 9002, 9003, 9999, 179, # contiv
+                                   2379, 4001, 2380, 7001,          # etcd
+                                   4789,                            # ovs
+                                   2181,2888, 3888,                 # zookeeper
+                                   5050, 5051,                      # mesos
+                                   8080, 35990                      # marathon
+                                 ]
+  environment: "{{ proxy_env }}"
+
+- hosts: all
+  become: true
+  roles:
+    - { role: .ansible_java, java_version: "8", java_register_env: "true" }
+  environment: "{{ proxy_env }}"
+
+
+- hosts: master
+  become: true
+  roles:
+    - role: .ansible_etcd
+  vars:
+     etcd_peers_group: master
+     etcd_interface: "{{ netplugin_ctrl_interface }}"
+     etcd_client_port: "2379"
+     etcd_listen_client_urls: "http://0.0.0.0:{{etcd_client_port}}"
+     etcd_initial_cluster_token: "{{ cluster_name }}"
+  environment: "{{ proxy_env }}"
+
+- hosts: nodes
+  become: true
+  roles:
+    - role: .ansible_etcd
+  vars:
+     etcd_peers_group: master
+     etcd_proxy: "on"
+     etcd_interface: "{{ netplugin_ctrl_interface }}"
+     etcd_client_port: "2379"
+     etcd_listen_client_urls: "http://0.0.0.0:{{etcd_client_port}}"
+     etcd_initial_cluster_token: "{{ cluster_name }}"
+  environment: "{{ proxy_env }}" 
+
+- hosts: master
+  become: true
+  roles:
+  - role: .ansible_zookeeper
+  vars:
+       zookeeper_url: "https://www.apache.org/dist/zookeeper/zookeeper-3.4.6/zookeeper-3.4.6.tar.gz"
+       zookeeper_version: "3.4.8"
+       zookeeper_hosts: "{{ groups['master'] }}"
+  environment: "{{ proxy_env }}"
+
+- hosts: nodes
+  become: true
+  roles:
+  - role: .ansible_zookeeper
+  vars:
+       zookeeper_url: "https://www.apache.org/dist/zookeeper/zookeeper-3.4.6/zookeeper-3.4.6.tar.gz"
+       zookeeper_version: "3.4.8"
+  environment: "{{ proxy_env }}"
+
+- hosts: all
+  become: true
+  roles:
+    - role: .ansible_ovs
+  environment: "{{ proxy_env }}"
+
+- hosts: master
+  become: true
+  roles:
+    - { role: .ansible_contivnet, netmaster: "yes", netmaster_node: "{{ inventory_hostname }}" }
+  environment: "{{ proxy_env }}"
+
+- hosts: nodes
+  become: true
+  roles:
+    - { role: .ansible_contivnet, netmaster_node: "{{ groups['master'][0] }}" }
+  environment: "{{ proxy_env }}"
+
+- hosts: all
+  become: true
+  roles:
+    - role: .ansible_mesos 
+  vars:
+      mesos_version: "1.0.0"
+      mesosphere_yum_repo: "http://repos.mesosphere.com/el-testing/7/noarch/RPMS/mesosphere-el-repo-7-3.noarch.rpm"
+      mesos_ip: "{{ hostvars[inventory_hostname]['ansible_' + netplugin_ctrl_interface]['ipv4']['address'] }}"
+      zookeeper_hostnames: "{{ groups.master | join(':' + zookeeper_client_port + ',')  }}:{{ zookeeper_client_port  }}"
+      mesos_cluster_name: "{{ cluster_name }}"
+      mesos_slave_additional_configs: [ {name: "CONTAINERIZERS", value: "mesos"}, 
+                                        {name: "NETWORK_CNI_CONFIG_DIR", value: "/var/lib/mesos/cni/config/"},
+                                        {name: "NETWORK_CNI_PLUGINS_DIR", value: "/var/lib/mesos/cni/plugins/"}, 
+                                        {name: "ISOLATION", value: "filesystem/linux,docker/runtime"},
+                                        {name: "HTTP_COMMAND_EXECUTOR", value: "true"},
+                                        {name: "IMAGE_PROVIDERS", value: "docker" }
+                                      ]
+  environment: "{{ proxy_env }}"
+
+- hosts: master[0]
+  become: true
+  roles: 
+   -  role: .ansible_marathon
+  vars:
+       marathon_version: "1.3.0"
+       mesosphere_yum_repo: "http://repos.mesosphere.com/el-testing/7/noarch/RPMS/mesosphere-el-repo-7-3.noarch.rpm"
+       yum_enablerepo: "mesosphere-testing"
+       yum_disablerepo: "*"
+       marathon_ip: "{{ hostvars[inventory_hostname]['ansible_' + netplugin_ctrl_interface]['ipv4']['address'] }}"
+       zookeeper_client_port: "2181"
+       zookeeper_hostnames: "{{ groups.master | join(':' + zookeeper_client_port + ',')  }}:{{ zookeeper_client_port  }}"
+       marathon_hostname: "{{ ansible_hostname }}"
+       marathon_zookeeper_state: "zk://{{ marathon_ip }}:{{ zookeeper_client_port }}/marathon"
+       haproxy_script_location: ""
+       marathon_env_vars: 
+          - "JAVA_OPTS=-Xmx512m" 
+          - "LIBPROCESS_IP={{ marathon_ip }}"
+          - "LIBPROCESS_PORT=35990"
+          - "MARATHON_DISABLE_HA"
+  environment: "{{ proxy_env }}"
