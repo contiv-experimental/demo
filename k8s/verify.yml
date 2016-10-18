@@ -30,6 +30,9 @@
   - name: Verify | netmaster status
     shell: service netmaster status | grep running
 
+  - name: Verify | default service account
+    shell: kubectl describe serviceaccount default | grep "default-token"
+
   - name: Verify | access to port 9002
     shell: curl "{{ hostvars[item]['contiv_control_ip'] }}":9002
     register: curl_9002
