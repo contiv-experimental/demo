@@ -1,0 +1,19 @@
+## Connection Info
+##
+## Fill in the interface information for each of the servers
+## For each of the servers mention the following details
+## <server_ip_or_dns>:
+##      control: <mandatory> Interface to use for control traffic
+##      data: <mandatory> Interface to use for data traffic
+##
+## You may use the IP address or the hostname (if you have DNS).
+## However, you need to be consistent as the installer tries match
+## what you enter here against what you pass to net_demo_installer
+## on the command line.
+#CONNECTION_INFO:
+#      <server1-ip-or-dns>:
+#        control: eth1
+#        data: eth2
+#      <server2-ip-or-dns>:
+#        control: eth7
+#        data: eth2
