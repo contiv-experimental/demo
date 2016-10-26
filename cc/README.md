@@ -24,7 +24,7 @@ git clone -b clearcontainer https://github.com/contiv/demo
 
 #### Step 3: Setup the demo configuration
 
-Create a cfg.yaml file under ~/demo/cc with right information for your setup
+Create a cfg.yaml file under ~/demo/cc with right information for your setup. Use extras/sample_cfg.yml as template. Here is a sample configuration file:
 
 ```
 ## Connection Info
