@@ -74,7 +74,7 @@ $ docker run -itd --runtime=cor --name=ccdb --net=contiv-net alpine /bin/sh
 $ docker exec -it web /bin/sh
 < inside the container >
 root@f90e7fd409c4:/# ping ccweb
-PING db (20.1.1.3) 56(84) bytes of data.
-64 bytes from db (20.1.1.4): icmp_seq=1 ttl=64 time=0.658 ms
-64 bytes from db (20.1.1.4): icmp_seq=2 ttl=64 time=0.103 ms
+PING ccweb (20.1.1.4) 56(84) bytes of data.
+64 bytes from ccweb (20.1.1.4): icmp_seq=1 ttl=64 time=0.658 ms
+64 bytes from ccweb (20.1.1.4): icmp_seq=2 ttl=64 time=0.103 ms
 ```
