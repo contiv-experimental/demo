@@ -33,9 +33,25 @@
 #APIC_EPG_BRIDGE_DOMAIN: "not_specified"
 #APIC_CONTRACTS_UNRESTRICTED_MODE: "no"
 
-## Full path of the leaf nodes connected to your servers.
-## List each node on a new line as shown commented
+# Provide server to ACI physical connectivity information below. 
+# This information is used for establishing EPG bindings. 
+# You can specify node level binding, path level binding, or a mix of both as shown in examples.
+
+## Node Level Bindings: 
 #APIC_LEAF_NODES:
 #    - topology/pod-1/node-101
 #    - topology/pod-1/node-102
+
+## Port level binding (aka path level binding):
+#APIC_LEAF_NODES:
+#    - topology/pod-1/paths-101/pathep-[eth1/14]
+#    - topology/pod-1/paths-101/pathep-[eth1/15]
+## Here we are binding to only eth1/14 and eth1/15 ports of leaf 101 as opposed to full leaf level binding in earlier case.
+
+## Mix of Nodes and Ports:
+#APIC_LEAF_NODES:
+#    - topology/pod-1/paths-101/pathep-[eth1/14]
+#    - topology/pod-1/paths-101/pathep-[eth1/15]
+#    - topology/pod-1/node-102
+
 ##===============================================================
