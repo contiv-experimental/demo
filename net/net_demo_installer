@@ -191,7 +191,7 @@ function sudoExec() {
     sudo -E $@
 }
 
-: ${contiv_network_version:=v0.1-11-30-2016.20-08-20.UTC}
+: ${contiv_network_version:=v0.1-12-23-2016.19-44-42.UTC}
 echo "Using version: $contiv_network_version"
 
 docker_version="1.11.1"
