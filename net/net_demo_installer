@@ -412,10 +412,10 @@ ansible-playbook $ans_opts -i $HOST_INVENTORY_FILE  -e "`cat $ENV_FILE`" $ANSIBL
 
 # Bring up containers for demo when provisioning in ACI mode
 if [ $network_mode == "ACI" ]; then
-    sudoExec docker pull jainvipin/web
-    sudoExec docker tag -f jainvipin/web web
-    sudoExec docker pull jainvipin/redis
-    sudoExec docker tag -f jainvipin/redis redis
+    sudoExec docker pull contiv/web
+    sudoExec docker tag -f contiv/web web
+    sudoExec docker pull contiv/redis
+    sudoExec docker tag -f contiv/redis redis
 fi
 
 # Verify if the installation is successful by checking status of installed services
