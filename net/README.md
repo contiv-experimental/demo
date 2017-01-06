@@ -69,8 +69,10 @@ e.g.
 ```
 export aci_gw_image="contiv/aci-gw:v2"
 ```
-
 Will fetch container aci-gw of contiv user from docker hub registry with v2 tag.
+
+Latest information about aci-gw container image can be found here : https://hub.docker.com/r/contiv/aci-gw/tags/
+
 
 Run net_demo_installer script. 
 
