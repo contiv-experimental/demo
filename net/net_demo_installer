@@ -54,6 +54,38 @@ function ParseInventoryFile {
     done
 }
 
+# Function to get user confirmation to proceed
+function ConfirmPrompt {
+  # wait for user input if running in interactive mode, else pick
+  # the default value passed by the caller
+  if [ "$INTERACTIVE_MODE" != "yes" ]; then
+      if [ "$1" == "n" ]; then
+          echo "interactive mode was turned off, assuming not to proceed"
+          exit 1
+      else
+          echo "interactive mode was turned on, assuming ok to proceed"
+          return
+      fi
+  fi
+
+  if [ $silent_mode == false ] ;  then
+  	while true ; do
+    		read -p "Ready to proceed(y/n)? " choice
+    		if [ "$choice" == "y" ]; then
+        			break
+    		fi
+
+    		if [ "$choice" == "n" ]; then
+        			echo "Try again when you are ready."
+        			exit 1
+   	 	else
+       			 echo "Please answer y or n"
+        			continue
+    		fi
+  	done
+    fi
+}
+
 # For the CLI arguments
 while getopts "scarhl" opt; do
     case $opt in
@@ -95,38 +127,6 @@ while getopts "scarhl" opt; do
             ;;
     esac
 done
-
-# Function to get user confirmation to proceed
-function ConfirmPrompt {
-  # wait for user input if running in interactive mode, else pick
-  # the default value passed by the caller
-  if [ "$INTERACTIVE_MODE" != "yes" ]; then
-      if [ "$1" == "n" ]; then
-          echo "interactive mode was turned off, assuming not to proceed"
-          exit 1
-      else
-          echo "interactive mode was turned on, assuming ok to proceed"
-          return
-      fi
-  fi
-
-  if [ $silent_mode == false ] ;  then
-  	while true ; do
-    		read -p "Ready to proceed(y/n)? " choice
-    		if [ "$choice" == "y" ]; then
-        			break
-    		fi
-
-    		if [ "$choice" == "n" ]; then
-        			echo "Try again when you are ready."
-        			exit 1
-   	 	else
-       			 echo "Please answer y or n"
-        			continue
-    		fi
-  	done
-    fi
-}
 
 # Function to generate inventory file
 function GenerateInventoryFile {
