@@ -54,6 +54,9 @@ class Inventory:
             outFd.write(var_line)
             var_line = "netplugin_if={} ".format(connInfo[node]['data'])
             outFd.write(var_line)
+            role = connInfo[node].get('role', 'worker')
+            var_line = "run_as={} ".format(role)
+            outFd.write(var_line)
             var_line = "fwd_mode={}\n".format(self.fwdMode)
             outFd.write(var_line)
 
