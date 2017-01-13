@@ -13,6 +13,8 @@ class SafeDict(dict):
 
 class Inventory:
     groupName = "netplugin-node"
+    masterGroupName = "netplugin-master"
+    workerGroupName = "netplugin-worker"
 
     def __init__(self, args):
         self.cfgFile = args[0]
@@ -37,36 +39,37 @@ class Inventory:
             cfg_entry = "{}={}\n".format(config.lower(), self.configInfo[config])
             outFd.write(cfg_entry)
 
-    def writeInventory(self, outFd):
-        outFd.write("[" + Inventory.groupName + "]\n")
-        self.nodeCount = 1
+    def writeInventory(self, outFd, groupName, groupRole):
+        outFd.write("[" + groupName + "]\n")
         connInfo = SafeDict(self.configInfo['CONNECTION_INFO'])
 
         # Add host entries in the inventory file
         for node in connInfo:
+            role = connInfo[node].get('role', 'worker')
+            if role != groupRole:
+                continue
             var_line = "node{} ".format(self.nodeCount)
             outFd.write(var_line)
             var_line = "ansible_ssh_host={} ".format(node)
             outFd.write(var_line)
-            var_line = "contiv_network_mode={} ".format(self.networkMode)
-            outFd.write(var_line)
             var_line = "control_interface={} ".format(connInfo[node]['control'])
             outFd.write(var_line)
-            var_line = "netplugin_if={} ".format(connInfo[node]['data'])
-            outFd.write(var_line)
-            role = connInfo[node].get('role', 'worker')
-            var_line = "run_as={} ".format(role)
-            outFd.write(var_line)
-            var_line = "fwd_mode={}\n".format(self.fwdMode)
+            var_line = "netplugin_if={} \n".format(connInfo[node]['data'])
             outFd.write(var_line)
 
             self.nodeCount += 1
 
-        self.nodeCount -= 1
+        outFd.write("\n")
+
+    def writeGlobalVars(self, outFd):
+        outFd.write("[" + "all:vars]\n")
+        var_line = "fwd_mode={}\n".format(self.fwdMode)
+        outFd.write(var_line)
+        var_line = "contiv_network_mode={}\n".format(self.networkMode)
+        outFd.write(var_line)
 
         # write group vars if network mode is ACI
         if self.networkMode == NW_MODE_ACI:
-            outFd.write("[" + Inventory.groupName + ":vars]\n")
             self.writeInventoryEntry(outFd, 'APIC_URL')
             self.writeInventoryEntry(outFd, 'APIC_USERNAME')
             self.writeInventoryEntry(outFd, 'APIC_PASSWORD')
@@ -103,7 +106,14 @@ class Inventory:
 
     def writeInventoryFile(self):
         with open(self.inventoryFile, "w+") as outFd:
-            self.writeInventory(outFd)
+            self.nodeCount = 1
+            self.writeInventory(outFd, Inventory.masterGroupName, "master")
+            self.writeInventory(outFd, Inventory.workerGroupName, "worker")
+            # The main group containing both the master and worker nodes
+            outFd.write("[" + Inventory.groupName + ":children]\n")
+            outFd.write(Inventory.masterGroupName + "\n")
+            outFd.write(Inventory.workerGroupName + "\n\n")
+            self.writeGlobalVars(outFd)
 
 if __name__ == "__main__":
     inv = Inventory(sys.argv[1:])
