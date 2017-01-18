@@ -410,14 +410,6 @@ fi
 echo "Setting up services on nodes"
 ansible-playbook $ans_opts -i $HOST_INVENTORY_FILE  -e "`cat $ENV_FILE`" $ANSIBLE_SITE_FILE
 
-# Bring up containers for demo when provisioning in ACI mode
-if [ $network_mode == "ACI" ]; then
-    sudoExec docker pull contiv/web
-    sudoExec docker tag contiv/web web
-    sudoExec docker pull contiv/redis
-    sudoExec docker tag contiv/redis redis
-fi
-
 # Verify if the installation is successful by checking status of installed services
 set -x
 # validate swarm container is running
