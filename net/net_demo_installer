@@ -194,7 +194,7 @@ function sudoExec() {
 : ${contiv_network_version:=v0.1-12-23-2016.19-44-42.UTC}
 echo "Using version: $contiv_network_version"
 
-docker_version="1.11.1"
+docker_version="1.12.6"
 : ${aci_gw_image:="contiv/aci-gw"}
 
 set -x
