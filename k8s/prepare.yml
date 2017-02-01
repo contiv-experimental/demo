@@ -53,7 +53,7 @@
 
   - name: Setup | configure control_ip
     shell: ifconfig "{{ contiv_control_if }}" "{{ contiv_control_ip }}"/24
-    when: "{{ management_ip }}" != "{{ contiv_control_ip }}"
+    when:  management_ip != contiv_control_ip
     tags:
       - if_cfg
 
