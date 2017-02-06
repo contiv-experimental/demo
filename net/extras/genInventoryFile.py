@@ -101,7 +101,9 @@ class Inventory:
 
     def writeNodeInfo(self):
         with open(self.nodeInfoFile, "w+") as nodeInfoFd:
-            node_info = "{}".format(self.nodeCount)
+            # Node count starts from 1 and is incremented for
+            # each node. So the actual number of nodes is nodeCount -1
+            node_info = "{}".format(self.nodeCount - 1)
             nodeInfoFd.write(node_info)
 
     def writeInventoryFile(self):
